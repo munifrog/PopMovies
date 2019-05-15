@@ -17,4 +17,8 @@ public interface MovieConst {
     String DETAILS_RELEASE_YEAR   = "movie_release_yyyy";
     String DETAILS_AVERAGE_RATING = "movie_rating";
     String DETAILS_IMAGE_URL      = "movie_image_url";
+
+    String SETTINGS_FILE          = "pop_movie_settings";
+    String SETTINGS_SORT_LAST     = "last_sort";
+
 }

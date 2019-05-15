@@ -4,7 +4,6 @@
     <string name="tmdb_attribution">This product uses the TMDb API but is not endorsed or certified by TMDb</string>
 
     <string name="image_description">Movie Poster</string>
-    <!--<string name="image_description_unreachable">&#45;&#45;</string>-->
 
     <string name="format_release_date">%2$s %3$d</string>
     <string name="format_average">(%1$d%%)</string>
@@ -15,6 +14,8 @@
     <string name="sample_text_overview">Description</string>
 
     <string name="action_about">About</string>
+    <string name="action_popularity">Sort by Popularity</string>
+    <string name="action_rating">Sort by Rating</string>
 
     <string-array name="months">
         <item >January</item>
@@ -30,5 +31,4 @@
         <item >November</item>
         <item >December</item>
     </string-array>
-
 </resources>
