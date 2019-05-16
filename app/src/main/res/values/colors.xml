@@ -3,8 +3,8 @@
     <color name="colorPrimary">#C0000000</color>
     <color name="colorPrimaryDark">#FF000000</color>
     <color name="colorAccent">#40000000</color>
-
     <color name="colorBackground">#FF000000</color>
     <color name="colorForeground">#80000000</color>
     <color name="colorText">#80FFFFFF</color>
+    <color name="colorToolbarText">#FFFFFFFF</color>
 </resources>

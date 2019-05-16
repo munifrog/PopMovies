@@ -14,8 +14,11 @@
     <string name="sample_text_overview">Description</string>
 
     <string name="action_about">About</string>
-    <string name="action_popularity">Sort by Popularity</string>
-    <string name="action_rating">Sort by Rating</string>
+    <string name="action_popularity">Popular</string>
+    <string name="action_rating">Liked</string>
+
+    <string name="sort_ctx_popular">Most Popular Movies</string>
+    <string name="sort_ctx_rating">Highest Rated Movies</string>
 
     <string-array name="months">
         <item >January</item>

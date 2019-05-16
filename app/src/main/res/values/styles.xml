@@ -1,11 +1,17 @@
 <resources>
 
     <!-- Base application theme. -->
+    <!--<style name="AppTheme"-->
+        <!--parent="Theme.AppCompat.Light.DarkActionBar">-->
     <style name="AppTheme"
-        parent="Theme.AppCompat.Light.DarkActionBar">
+        parent="@style/Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <!--https://stackoverflow.com/questions/28352963/change-toolbar-menu-item-color-non-hidden-action-->
+        <item name="actionMenuTextColor">@color/colorToolbarText</item>
+        <!--https://stackoverflow.com/questions/35453953/how-to-change-options-menu-dots-color-->
+        <item name="android:textColorSecondary">@color/colorToolbarText</item>
     </style>
 
     <!--How to disable the toolbar is explained here:

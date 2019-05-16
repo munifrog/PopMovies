@@ -6,11 +6,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.popularmovies.model.Movie;
@@ -26,7 +28,9 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
     private static List<Movie> mMovies;
 
     private static int mSortState;
-    private static Menu mMenu;
+    private static boolean mTransitioningSort;
+    private static android.support.v7.widget.Toolbar mToolbar;
+    private static ProgressBar mProgressBar;
     private static MenuItem mPopItem;
     private static MenuItem mRateItem;
 
@@ -35,6 +39,37 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Alternate Toolbar demonstrated at
+        // https://stackoverflow.com/questions/35648913/how-to-set-menu-to-toolbar-in-android
+        mToolbar = findViewById(R.id.toolbar);
+        mToolbar.inflateMenu(R.menu.main);
+        Menu menu = mToolbar.getMenu();
+        mPopItem = menu.findItem(R.id.action_sort_popularity);
+        mRateItem = menu.findItem(R.id.action_sort_rating);
+        showSortByMenuItem();
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int action = item.getItemId();
+                switch(action) {
+                    case R.id.action_about:
+                        showAboutInfo();
+                        return true;
+                    case R.id.action_sort_popularity:
+                        alternateMenuState();
+                        sortByCurrentChoice();
+                        return true;
+                    case R.id.action_sort_rating:
+                        alternateMenuState();
+                        sortByCurrentChoice();
+                        return true;
+                }
+
+                return false;
+            }
+        });
+
+        mProgressBar = findViewById(R.id.progressBar);
         restoreState();
         sortByCurrentChoice();
 
@@ -51,6 +86,9 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
     protected void onDestroy() {
         super.onDestroy();
         saveState();
+        // Try to avoid warned memory leak
+        mToolbar = null;
+        mProgressBar = null;
     }
 
     // URL <= Input params; Void <= progress; List<Movie> <= result
@@ -77,10 +115,13 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
         protected void onPostExecute(List<Movie> movies) {
             super.onPostExecute(movies);
             mMovies = movies;
+            mTransitioningSort = false;
+            mProgressBar.setVisibility(View.INVISIBLE);
         }
     }
 
     private void sortByPopularity() {
+        // Should only be called by sortByCurrentChoice()
         Uri uri = HttpManipulator.getSortedUri(0);
         Log.v(TAG, uri.toString());
 
@@ -88,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
     }
 
     private void sortByRatings() {
+        // Should only be called by sortByCurrentChoice()
         Uri uri = HttpManipulator.getSortedUri(1);
         Log.v(TAG, uri.toString());
 
@@ -116,61 +158,39 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        mMenu = menu;
-        mPopItem = mMenu.findItem(R.id.action_sort_popularity);
-        mRateItem = mMenu.findItem(R.id.action_sort_rating);
-        showSortByMenuItem();
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int action = item.getItemId();
-        switch(action) {
-            case R.id.action_about:
-                showAboutInfo();
-                return true;
-            case R.id.action_sort_popularity:
-                alternateMenuState();
-                sortByPopularity();
-                return true;
-            case R.id.action_sort_rating:
-                alternateMenuState();
-                sortByRatings();
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     private void alternateMenuState() {
-        if (mSortState == ENUM_SORT_AVERAGE_RATING_DESCENDING) {
-            mSortState = ENUM_SORT_POPULARITY_DESCENDING;
-            showSortByMenuItem();
-        } else if (mSortState == ENUM_SORT_POPULARITY_DESCENDING) {
-            mSortState = ENUM_SORT_AVERAGE_RATING_DESCENDING;
-            showSortByMenuItem();
+        if (!mTransitioningSort) {
+            if (mSortState == ENUM_SORT_AVERAGE_RATING_DESCENDING) {
+                mSortState = ENUM_SORT_POPULARITY_DESCENDING;
+                showSortByMenuItem();
+            } else if (mSortState == ENUM_SORT_POPULARITY_DESCENDING) {
+                mSortState = ENUM_SORT_AVERAGE_RATING_DESCENDING;
+                showSortByMenuItem();
+            }
         }
     }
 
-    private void showSortByMenuItem() {
+    private static void showSortByMenuItem() {
         if (mSortState == ENUM_SORT_AVERAGE_RATING_DESCENDING) {
+            mToolbar.setTitle(R.string.sort_ctx_rating);
             mPopItem.setVisible(true);
             mRateItem.setVisible(false);
         } else if (mSortState == ENUM_SORT_POPULARITY_DESCENDING) {
+            mToolbar.setTitle(R.string.sort_ctx_popular);
             mPopItem.setVisible(false);
             mRateItem.setVisible(true);
         }
     }
 
     private void sortByCurrentChoice() {
-        if (mSortState == ENUM_SORT_AVERAGE_RATING_DESCENDING) {
-            sortByRatings();
-        } else if (mSortState == ENUM_SORT_POPULARITY_DESCENDING) {
-            sortByPopularity();
+        if (!mTransitioningSort) {
+            mTransitioningSort = true;
+            mProgressBar.setVisibility(View.VISIBLE);
+            if (mSortState == ENUM_SORT_AVERAGE_RATING_DESCENDING) {
+                sortByRatings();
+            } else if (mSortState == ENUM_SORT_POPULARITY_DESCENDING) {
+                sortByPopularity();
+            }
         }
     }
 
