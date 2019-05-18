@@ -14,20 +14,8 @@
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:contentDescription="@string/image_description"
+        android:src="@drawable/avengers"
         android:background="@color/colorBackground"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <!--Foreground could also do this, but only on API levels > 23; this method always works-->
-    <ImageView
-        android:id="@+id/iv_movie_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/image_description"
-        android:background="@color/colorForeground"
-        android:scaleType="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
+        android:background="@color/colorForeground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -86,7 +75,7 @@
 
             <TextView
                 android:id="@+id/tv_plot"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/sample_text_overview"
@@ -94,8 +83,10 @@
                 android:textSize="@dimen/text_plot_height"
                 android:gravity="end"
                 android:textAlignment="viewEnd"
-                app:layout_constraintTop_toBottomOf="@+id/tv_release"
-                tools:layout_editor_absoluteX="0dp" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_release"/>
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
 
