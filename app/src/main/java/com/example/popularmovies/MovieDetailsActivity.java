@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utils.HttpManipulator;
 import com.squareup.picasso.Picasso;
 
@@ -28,15 +29,16 @@ public class MovieDetailsActivity extends AppCompatActivity implements MovieCons
 
         Intent intent = getIntent();
         if(intent != null) {
+            Movie movie = intent.getParcelableExtra(ENTIRE_PARCELLED_MOVIE);
+
             // Retrieve image first since it takes longest
-            String imageName = intent.getStringExtra(DETAILS_IMAGE_URL);
-            Uri imageUri = HttpManipulator.getImageUri(imageName, ENUM_IMAGE_ORIG);
+            Uri imageUri = HttpManipulator.getImageUri(movie.getImageUrl(), ENUM_IMAGE_ORIG);
             Picasso.get().load(imageUri).placeholder(R.drawable.poster_not_found).into(imageView);
 
-            String titleCurrent = intent.getStringExtra(DETAILS_TITLE_CURRENT);
+            String titleCurrent = movie.getTitleCurrent();
             name.setText(titleCurrent);
 
-            String titleOriginal = intent.getStringExtra(DETAILS_TITLE_ORIG);
+            String titleOriginal = movie.getTitleOriginal();
             if(titleCurrent.equals(titleOriginal)) {
                 nameAlternate.setHeight(0);
             } else {
@@ -50,28 +52,26 @@ public class MovieDetailsActivity extends AppCompatActivity implements MovieCons
                 nameAlternate.setText(titleOriginal);
             }
 
-            String plot = intent.getStringExtra(DETAILS_PLOT);
-            overview.setText(plot);
+            overview.setText(movie.getOverview());
 
-            int day = intent.getIntExtra(DETAILS_RELEASE_DAY, 1);
-            int month = intent.getIntExtra(DETAILS_RELEASE_MONTH, 1);
-            int year = intent.getIntExtra(DETAILS_RELEASE_YEAR, 2019);
-
-            String release;
+            Calendar releaseDate = movie.getRelease();
+            int day = releaseDate.get(Calendar.DATE);
+            int month = releaseDate.get(Calendar.MONTH);
+            int year = releaseDate.get(Calendar.YEAR);
+            String releaseString;
             if(year == 1970 && month == Calendar.JANUARY && day == 1) {
-                release = getString(R.string.unknown_release_date);
+                releaseString = getString(R.string.unknown_release_date);
             } else {
-                release = getString(
+                releaseString = getString(
                         R.string.format_release_date,
                         day,
                         months[month],
                         year
                 );
             }
+            mRelease.setText(releaseString);
 
-            mRelease.setText(release);
-
-            int averagePercent = intent.getIntExtra(DETAILS_AVERAGE_RATING, 0);
+            int averagePercent = Math.round(100.0f * movie.getRating());
             String average = getString(
                     R.string.format_average,
                     averagePercent

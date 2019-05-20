@@ -17,14 +17,7 @@ public interface MovieConst {
 
     String TMDB_API_KEY           = "PLACEHOLDER";
 
-    String DETAILS_TITLE_ORIG     = "movie_title_original";
-    String DETAILS_TITLE_CURRENT  = "movie_title_current";
-    String DETAILS_PLOT           = "movie_plot";
-    String DETAILS_RELEASE_DAY    = "movie_release_dd";
-    String DETAILS_RELEASE_MONTH  = "movie_release_mm";
-    String DETAILS_RELEASE_YEAR   = "movie_release_yyyy";
-    String DETAILS_AVERAGE_RATING = "movie_rating";
-    String DETAILS_IMAGE_URL      = "movie_image_url";
+    String ENTIRE_PARCELLED_MOVIE = "movie_entire";
 
     String SETTINGS_FILE          = "pop_movie_settings";
     String SETTINGS_SORT_LAST     = "last_sort";

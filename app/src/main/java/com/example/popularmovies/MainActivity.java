@@ -22,7 +22,6 @@ import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utils.HttpManipulator;
 import com.example.popularmovies.utils.JsonManipulator;
 
-import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieConst,
@@ -197,18 +196,8 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
     private void launchDetails(int index) {
         if(mMovies != null && index > -1 && index < MAX_MOVIES_RETRIEVED) {
             Movie movie = mMovies.get(index);
-
             Intent intent = new Intent(this, MovieDetailsActivity.class);
-            intent.putExtra(DETAILS_TITLE_CURRENT, movie.getTitleCurrent());
-            intent.putExtra(DETAILS_TITLE_ORIG, movie.getTitleOriginal());
-            intent.putExtra(DETAILS_PLOT, movie.getOverview());
-            Calendar date = movie.getRelease();
-            intent.putExtra(DETAILS_RELEASE_DAY, date.get(Calendar.DATE));
-            intent.putExtra(DETAILS_RELEASE_MONTH, date.get(Calendar.MONTH));
-            intent.putExtra(DETAILS_RELEASE_YEAR, date.get(Calendar.YEAR));
-            intent.putExtra(DETAILS_AVERAGE_RATING, Math.round(100.0f * movie.getRating()));
-            intent.putExtra(DETAILS_IMAGE_URL, movie.getImageUrl());
-
+            intent.putExtra(ENTIRE_PARCELLED_MOVIE, movie);
             startActivity(intent);
         }
     }

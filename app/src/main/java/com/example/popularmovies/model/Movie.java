@@ -1,10 +1,12 @@
 package com.example.popularmovies.model;
 
 import android.graphics.drawable.Drawable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.Calendar;
 
-public class Movie {
+public class Movie implements Parcelable {
     private String mTitleCurrent;
     private String mTitleOriginal;
     private String mImagePath;
@@ -12,6 +14,23 @@ public class Movie {
     private String mOverview;
     private float mRating;
     private Calendar mReleaseDate;
+
+    private Movie (Parcel parcel) {
+        // Note these must appear in same order as writeToParcel that creates the Parcel
+        mTitleCurrent = parcel.readString();
+        mTitleOriginal = parcel.readString();
+        mImagePath = parcel.readString();
+        // mImageSmall not included in parcel; retrieve using mImagePath as before
+        mOverview = parcel.readString();
+        mRating = parcel.readFloat();
+        mReleaseDate = Calendar.getInstance();
+        int year = parcel.readInt();
+        mReleaseDate.set(Calendar.YEAR, year);
+        int month = parcel.readInt();
+        mReleaseDate.set(Calendar.MONTH, month);
+        int date = parcel.readInt();
+        mReleaseDate.set(Calendar.DATE, date);
+    }
 
     public Movie(
             String titleCurrent,
@@ -51,4 +70,35 @@ public class Movie {
 
     public Calendar getRelease() { return this.mReleaseDate; }
     public void setRelease(Calendar newReleaseDate) { this.mReleaseDate = newReleaseDate; }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        // Note these must appear in same order as constructor that takes Parcel
+        parcel.writeString(mTitleCurrent);
+        parcel.writeString(mTitleOriginal);
+        parcel.writeString(mImagePath);
+        // mImageSmall not included in parcel; retrieve using mImagePath as before
+        parcel.writeString(mOverview);
+        parcel.writeFloat(mRating);
+        parcel.writeInt(mReleaseDate.get(Calendar.YEAR));
+        parcel.writeInt(mReleaseDate.get(Calendar.MONTH));
+        parcel.writeInt(mReleaseDate.get(Calendar.DATE));
+    }
+
+    static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel parcel) {
+            return new Movie(parcel);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }
