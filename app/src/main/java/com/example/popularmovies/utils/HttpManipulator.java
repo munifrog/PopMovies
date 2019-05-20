@@ -34,6 +34,19 @@ public class HttpManipulator {
     private final static String TMDB_API_V_SORT_POPULARITY = "popularity.desc";
     private final static String TMDB_API_V_SORT_RATING = "vote_average.desc";
 
+    private final static String TMDB_API_Q_LANG = "language";
+    private final static String TMDB_API_V_LANG = "en";
+    private final static String TMDB_API_Q_LIST_STYLE = "list_style";
+    private final static String TMDB_API_V_LIST_STYLE = "1";
+    private final static String TMDB_API_Q_MEDIA_TYPE = "media_type";
+    private final static String TMDB_API_V_MEDIA_TYPE = "movie";
+    private final static String TMDB_API_Q_RELEASE = "primary_release_year";
+    private final static String TMDB_API_V_RELEASE = "2019";
+    private final static String TMDB_API_Q_VOTE_COUNT = "vote_count.gte";
+    private final static String TMDB_API_V_VOTE_COUNT = "0";
+
+    private final static String TMDB_API_Q_PAGE = "page"; // Values are numbers like 1, 2, etc...
+
     public static URL uri2url(Uri uri) {
         URL url = null;
 
@@ -51,6 +64,11 @@ public class HttpManipulator {
                 .authority(TMDB_API_AUTHORITY)
                 .path(TMDB_PATH_API_LEVEL)
                 .appendQueryParameter(TMDB_API_Q_KEY, TMDB_API_V_KEY)
+                .appendQueryParameter(TMDB_API_Q_LANG, TMDB_API_V_LANG)
+                .appendQueryParameter(TMDB_API_Q_LIST_STYLE, TMDB_API_V_LIST_STYLE)
+                .appendQueryParameter(TMDB_API_Q_MEDIA_TYPE, TMDB_API_V_MEDIA_TYPE)
+                .appendQueryParameter(TMDB_API_Q_RELEASE, TMDB_API_V_RELEASE)
+                .appendQueryParameter(TMDB_API_Q_VOTE_COUNT, TMDB_API_V_VOTE_COUNT)
                 ;
     }
 
@@ -67,17 +85,19 @@ public class HttpManipulator {
                 .appendPath(TMDB_PATH_MOVIE);
     }
 
-    public static Uri getSortedUri(int sortBy) {
+    public static Uri getSortedUri(int sortBy, int page) {
         Uri uri = null;
         switch(sortBy) {
             case MovieConst.ENUM_SORT_POPULARITY_DESCENDING:
                 uri = getSortedBase()
                         .appendQueryParameter(TMDB_API_Q_SORT, TMDB_API_V_SORT_POPULARITY)
+                        .appendQueryParameter(TMDB_API_Q_PAGE, String.valueOf(page))
                         .build();
                 break;
             case MovieConst.ENUM_SORT_AVERAGE_RATING_DESCENDING:
                 uri = getSortedBase()
                         .appendQueryParameter(TMDB_API_Q_SORT, TMDB_API_V_SORT_RATING)
+                        .appendQueryParameter(TMDB_API_Q_PAGE, String.valueOf(page))
                         .build();
                 break;
         }

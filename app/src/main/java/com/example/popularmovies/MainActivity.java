@@ -175,13 +175,13 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
 
     private void sortByPopularity() {
         // Should only be called by sortByCurrentChoice()
-        Uri uri = HttpManipulator.getSortedUri(0);
+        Uri uri = HttpManipulator.getSortedUri(0, 1);
         new SortedMovieDiscoverer().execute(uri);
     }
 
     private void sortByRatings() {
         // Should only be called by sortByCurrentChoice()
-        Uri uri = HttpManipulator.getSortedUri(1);
+        Uri uri = HttpManipulator.getSortedUri(1, 1);
         new SortedMovieDiscoverer().execute(uri);
     }
 
