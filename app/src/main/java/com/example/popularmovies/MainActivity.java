@@ -28,7 +28,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MovieConst,
         GridAdapter.GridClickListener {
     private static List<Movie> mMovies;
-    private static Drawable [] mImages;
     private static Drawable mPlaceholder;
 
     private static int mSortState;
@@ -98,33 +97,34 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
     }
 
     static void postMovieRetrieval() {
-
         if(mMovies != null) {
             int length = mMovies.size();
-            mImages = new Drawable[length];
+            Drawable [] images = new Drawable[length];
             Drawable currentDrawable;
             for(int i = 0; i < length; i++) {
                 Movie movie = mMovies.get(i);
 
                 currentDrawable = movie.getImageSmall();
                 if(currentDrawable != null) {
-                    mImages[i] = currentDrawable;
+                    images[i] = currentDrawable;
                 } else {
-                    mImages[i] = mPlaceholder;
+                    images[i] = mPlaceholder;
                 }
             }
+
+            int spanCount = (mOrientation == Configuration.ORIENTATION_LANDSCAPE ? 5 : 3);
+            GridLayoutManager layoutManager = new GridLayoutManager(mContext, spanCount);
+            mGridRecyclerView.setLayoutManager(layoutManager);
+            GridAdapter adapter = new GridAdapter(images, mListener);
+            mGridRecyclerView.setAdapter(adapter);
+
+            mTransitioningSort = false;
+            mProgressBar.setVisibility(View.INVISIBLE);
+
+            mGridRecyclerView.setPadding(0, mStatusBarHeight,0,0);
+        } else {
+            Toast.makeText(mContext, R.string.error_internet_failure, Toast.LENGTH_LONG).show();
         }
-
-        int spanCount = (mOrientation == Configuration.ORIENTATION_LANDSCAPE ? 5 : 3);
-        GridLayoutManager layoutManager = new GridLayoutManager(mContext, spanCount);
-        mGridRecyclerView.setLayoutManager(layoutManager);
-        GridAdapter adapter = new GridAdapter(mImages, mListener);
-        mGridRecyclerView.setAdapter(adapter);
-
-        mTransitioningSort = false;
-        mProgressBar.setVisibility(View.INVISIBLE);
-
-        mGridRecyclerView.setPadding(0, mStatusBarHeight,0,0);
     }
 
     // https://stackoverflow.com/questions/20584325/reliably-get-height-of-status-bar-to-solve-kitkat-translucent-navigation-issue
@@ -154,9 +154,14 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
     static class SortedMovieDiscoverer extends AsyncTask<Uri, Void, List<Movie>> {
         @Override
         protected List<Movie> doInBackground(Uri... uris) {
-            Uri uri = uris[0];
-            String json = HttpManipulator.getResponse(HttpManipulator.uri2url(uri));
-            List<Movie> movies = JsonManipulator.extractMoviesFromJson(json);
+            List<Movie> movies = null;
+            try {
+                Uri uri = uris[0];
+                String json = HttpManipulator.getResponse(HttpManipulator.uri2url(uri));
+                movies = JsonManipulator.extractMoviesFromJson(json);
+            } catch (RuntimeException e) {
+                // Internet unavailable
+            }
             return movies;
         }
 
