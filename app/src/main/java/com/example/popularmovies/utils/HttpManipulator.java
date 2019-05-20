@@ -1,10 +1,12 @@
 package com.example.popularmovies.utils;
 
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 
 import com.example.popularmovies.MovieConst;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -14,17 +16,16 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class HttpManipulator {
-
     private final static String TMDB_SCHEME = "https";
     private final static String TMDB_API_AUTHORITY = "api.themoviedb.org";
     private final static String TMDB_IMAGE_AUTHORITY = "image.tmdb.org";
     private final static String TMDB_PATH_API_LEVEL = "3";
     private final static String TMDB_PATH_DISCOVER = "discover";
     private final static String TMDB_PATH_MOVIE = "movie";
-    private final static String TMDB_PATH_IMAGE_SM = "t/p/w185"; // Recommended by Udacity
-    private final static String TMDB_PATH_IMAGE_MD = "t/p/w500"; // Examples on TMDb API site
-    private final static String TMDB_PATH_IMAGE_LG = "t/p/original";
-    private final static String TMDB_PATH_IMAGE = TMDB_PATH_IMAGE_LG;
+    private final static String TMDB_PATH_IMAGE_T = "t";
+    private final static String TMDB_PATH_IMAGE_P = "p";
+    private final static String TMDB_PATH_IMAGE_ORIG = "original";
+    private final static String TMDB_PATH_IMAGE_WIDE = "w";
 
     private final static String TMDB_API_Q_KEY = "api_key";
     private final static String TMDB_API_V_KEY = MovieConst.TMDB_API_KEY;
@@ -57,7 +58,6 @@ public class HttpManipulator {
         return new Uri.Builder()
                 .scheme(TMDB_SCHEME)
                 .authority(TMDB_IMAGE_AUTHORITY)
-                .path(TMDB_PATH_IMAGE)
                 ;
     }
 
@@ -84,12 +84,19 @@ public class HttpManipulator {
         return uri;
     }
 
-    public static Uri getImageUri(String imagePathAndName) {
+    public static Uri getImageUri(String imagePathAndName, int size) {
+        String imageSize = (size == 0 ? TMDB_PATH_IMAGE_ORIG : TMDB_PATH_IMAGE_WIDE + size);
+
         Uri uri;
         if (imagePathAndName != null) {
-            uri = baseImageUriBuilder().appendPath(imagePathAndName).build();
+            uri = baseImageUriBuilder()
+                    .appendPath(TMDB_PATH_IMAGE_T)
+                    .appendPath(TMDB_PATH_IMAGE_P)
+                    .appendPath(imageSize)
+                    .appendPath(imagePathAndName)
+                    .build()
+            ;
         } else {
-            // TODO: Is there a default image URL at TMDb? or else I could use my own with Picasso default image ...
             uri = baseImageUriBuilder().appendPath(imagePathAndName).build();
         }
         return uri;
@@ -113,5 +120,25 @@ public class HttpManipulator {
             e.printStackTrace();
         }
         return body;
+    }
+
+    // https://stackoverflow.com/questions/26689464/how-to-download-image-file-by-using-okhttpclient-in-java
+    static Drawable getImage(URL url) {
+        Drawable image = null;
+
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            ResponseBody rBody = response.body();
+            if(rBody != null) {
+                InputStream stream = rBody.byteStream();
+                image = Drawable.createFromStream(stream, "useless");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
     }
 }

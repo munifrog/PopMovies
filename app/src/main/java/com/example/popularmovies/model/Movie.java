@@ -1,33 +1,47 @@
 package com.example.popularmovies.model;
 
+import android.graphics.drawable.Drawable;
+
 import java.util.Calendar;
 
 public class Movie {
-    private String mTitle;
-    private String mImageUrl;
+    private String mTitleCurrent;
+    private String mTitleOriginal;
+    private String mImagePath;
+    private Drawable mImageSmall;
     private String mOverview;
     private float mRating;
     private Calendar mReleaseDate;
 
     public Movie(
-            String title,
-            String imageUrl,
+            String titleCurrent,
+            String titleOriginal,
+            String imagePath,
+            Drawable imageSmall,
             String overview,
             float rating,
             Calendar releaseDate)
     {
-        mTitle = title;
-        mImageUrl = imageUrl;
+        mTitleCurrent = titleCurrent;
+        mTitleOriginal = titleOriginal;
+        mImagePath = imagePath;
+        mImageSmall = imageSmall;
         mOverview = overview;
         mRating = rating;
         mReleaseDate = releaseDate;
     }
 
-    public String getTitle() { return this.mTitle; }
-    public void setTitle(String newTitle) { this.mTitle = newTitle; }
+    public String getTitleCurrent() { return this.mTitleCurrent; }
+    public void setTitleCurrent(String newTitle) { this.mTitleCurrent = newTitle; }
 
-    public String getImageUrl() { return this.mImageUrl; }
-    public void setImageUrl(String newImageUrl) { this.mImageUrl = newImageUrl; }
+    public String getTitleOriginal() { return this.mTitleOriginal; }
+    public void setTitleOriginal(String newTitle) { this.mTitleOriginal = newTitle; }
+
+    public String getImageUrl() { return this.mImagePath; }
+    public void setImageUrl(String newImageUrl) { this.mImagePath = newImageUrl; }
+
+    public Drawable getImageSmall() { return this.mImageSmall; }
+    public void setImageSmall(Drawable newImageSmall) { this.mImageSmall = newImageSmall; }
 
     public String getOverview() { return this.mOverview; }
     public void setOverview(String newOverview) { this.mOverview = newOverview; }

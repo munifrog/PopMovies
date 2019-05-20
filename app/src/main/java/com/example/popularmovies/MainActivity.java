@@ -1,17 +1,20 @@
 package com.example.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -22,10 +25,11 @@ import com.example.popularmovies.utils.JsonManipulator;
 import java.util.Calendar;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MovieConst {
-    private final static String TAG = MainActivity.class.getSimpleName();
-
+public class MainActivity extends AppCompatActivity implements MovieConst,
+        GridAdapter.GridClickListener {
     private static List<Movie> mMovies;
+    private static Drawable [] mImages;
+    private static Drawable mPlaceholder;
 
     private static int mSortState;
     private static boolean mTransitioningSort;
@@ -34,10 +38,18 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
     private static MenuItem mPopItem;
     private static MenuItem mRateItem;
 
+    private static int mOrientation;
+    private static RecyclerView mGridRecyclerView;
+    private static Context mContext;
+    private static GridAdapter.GridClickListener mListener;
+    private static int mStatusBarHeight;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mTransitioningSort = false;
 
         // Alternate Toolbar demonstrated at
         // https://stackoverflow.com/questions/35648913/how-to-set-menu-to-toolbar-in-android
@@ -70,16 +82,63 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
         });
 
         mProgressBar = findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.INVISIBLE);
         restoreState();
         sortByCurrentChoice();
 
-        Button details = findViewById(R.id.button_details);
-        details.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchDetails(0);
+        // Orientation detection described here:
+        // https://stackoverflow.com/questions/2795833/check-orientation-on-android-phone
+        mOrientation = getResources().getConfiguration().orientation;
+        mGridRecyclerView = findViewById(R.id.rv_grid);
+        mContext = this;
+        mListener = this;
+
+        mPlaceholder = getResources().getDrawable(R.drawable.poster_not_found);
+        mStatusBarHeight = getStatusBarHeight();
+    }
+
+    static void postMovieRetrieval() {
+
+        if(mMovies != null) {
+            int length = mMovies.size();
+            mImages = new Drawable[length];
+            Drawable currentDrawable;
+            for(int i = 0; i < length; i++) {
+                Movie movie = mMovies.get(i);
+
+                currentDrawable = movie.getImageSmall();
+                if(currentDrawable != null) {
+                    mImages[i] = currentDrawable;
+                } else {
+                    mImages[i] = mPlaceholder;
+                }
             }
-        });
+        }
+
+        int spanCount = (mOrientation == Configuration.ORIENTATION_LANDSCAPE ? 5 : 3);
+        GridLayoutManager layoutManager = new GridLayoutManager(mContext, spanCount);
+        mGridRecyclerView.setLayoutManager(layoutManager);
+        GridAdapter adapter = new GridAdapter(mImages, mListener);
+        mGridRecyclerView.setAdapter(adapter);
+
+        mTransitioningSort = false;
+        mProgressBar.setVisibility(View.INVISIBLE);
+
+        mGridRecyclerView.setPadding(0, mStatusBarHeight,0,0);
+    }
+
+    // https://stackoverflow.com/questions/20584325/reliably-get-height-of-status-bar-to-solve-kitkat-translucent-navigation-issue
+    private int getStatusBarHeight() {
+        int result = 0;
+        int resId = getResources().getIdentifier(
+                "status_bar_height",
+                "dimen",
+                "android"
+        );
+        if (resId > 0) {
+            result = getResources().getDimensionPixelSize(resId);
+        }
+        return result;
     }
 
     @Override
@@ -96,18 +155,8 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
         @Override
         protected List<Movie> doInBackground(Uri... uris) {
             Uri uri = uris[0];
-
             String json = HttpManipulator.getResponse(HttpManipulator.uri2url(uri));
             List<Movie> movies = JsonManipulator.extractMoviesFromJson(json);
-            if(movies != null) {
-                int length = movies.size();
-                for(int i = 0; i < length; i++) {
-                    Movie movie = movies.get(i);
-                    Log.v(TAG, "Sorted[" + i + "]: \"" + movie.getTitle() + "\"");
-                    Log.v(TAG, "Sorted[" + i + "]: \"" + HttpManipulator.getImageUri(movie.getImageUrl()) + "\"");
-                }
-            }
-
             return movies;
         }
 
@@ -115,24 +164,19 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
         protected void onPostExecute(List<Movie> movies) {
             super.onPostExecute(movies);
             mMovies = movies;
-            mTransitioningSort = false;
-            mProgressBar.setVisibility(View.INVISIBLE);
+            postMovieRetrieval();
         }
     }
 
     private void sortByPopularity() {
         // Should only be called by sortByCurrentChoice()
         Uri uri = HttpManipulator.getSortedUri(0);
-        Log.v(TAG, uri.toString());
-
         new SortedMovieDiscoverer().execute(uri);
     }
 
     private void sortByRatings() {
         // Should only be called by sortByCurrentChoice()
         Uri uri = HttpManipulator.getSortedUri(1);
-        Log.v(TAG, uri.toString());
-
         new SortedMovieDiscoverer().execute(uri);
     }
 
@@ -140,12 +184,18 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
         Toast.makeText(this, R.string.tmdb_attribution, Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void onClick(int position) {
+        launchDetails(position);
+    }
+
     private void launchDetails(int index) {
         if(mMovies != null && index > -1 && index < MAX_MOVIES_RETRIEVED) {
             Movie movie = mMovies.get(index);
 
             Intent intent = new Intent(this, MovieDetailsActivity.class);
-            intent.putExtra(DETAILS_TITLE, movie.getTitle());
+            intent.putExtra(DETAILS_TITLE_CURRENT, movie.getTitleCurrent());
+            intent.putExtra(DETAILS_TITLE_ORIG, movie.getTitleOriginal());
             intent.putExtra(DETAILS_PLOT, movie.getOverview());
             Calendar date = movie.getRelease();
             intent.putExtra(DETAILS_RELEASE_DAY, date.get(Calendar.DATE));
@@ -167,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements MovieConst {
                 mSortState = ENUM_SORT_AVERAGE_RATING_DESCENDING;
                 showSortByMenuItem();
             }
+
         }
     }
 
