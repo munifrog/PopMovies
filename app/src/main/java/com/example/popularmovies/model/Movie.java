@@ -1,6 +1,5 @@
 package com.example.popularmovies.model;
 
-import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -10,7 +9,6 @@ public class Movie implements Parcelable {
     private String mTitleCurrent;
     private String mTitleOriginal;
     private String mImagePath;
-    private Drawable mImageSmall;
     private String mOverview;
     private float mRating;
     private Calendar mReleaseDate;
@@ -20,7 +18,6 @@ public class Movie implements Parcelable {
         mTitleCurrent = parcel.readString();
         mTitleOriginal = parcel.readString();
         mImagePath = parcel.readString();
-        // mImageSmall not included in parcel; retrieve using mImagePath as before
         mOverview = parcel.readString();
         mRating = parcel.readFloat();
         mReleaseDate = Calendar.getInstance();
@@ -36,7 +33,6 @@ public class Movie implements Parcelable {
             String titleCurrent,
             String titleOriginal,
             String imagePath,
-            Drawable imageSmall,
             String overview,
             float rating,
             Calendar releaseDate)
@@ -44,7 +40,6 @@ public class Movie implements Parcelable {
         mTitleCurrent = titleCurrent;
         mTitleOriginal = titleOriginal;
         mImagePath = imagePath;
-        mImageSmall = imageSmall;
         mOverview = overview;
         mRating = rating;
         mReleaseDate = releaseDate;
@@ -58,9 +53,6 @@ public class Movie implements Parcelable {
 
     public String getImageUrl() { return this.mImagePath; }
     public void setImageUrl(String newImageUrl) { this.mImagePath = newImageUrl; }
-
-    public Drawable getImageSmall() { return this.mImageSmall; }
-    public void setImageSmall(Drawable newImageSmall) { this.mImageSmall = newImageSmall; }
 
     public String getOverview() { return this.mOverview; }
     public void setOverview(String newOverview) { this.mOverview = newOverview; }
@@ -82,7 +74,6 @@ public class Movie implements Parcelable {
         parcel.writeString(mTitleCurrent);
         parcel.writeString(mTitleOriginal);
         parcel.writeString(mImagePath);
-        // mImageSmall not included in parcel; retrieve using mImagePath as before
         parcel.writeString(mOverview);
         parcel.writeFloat(mRating);
         parcel.writeInt(mReleaseDate.get(Calendar.YEAR));

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +26,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MovieConst,
         GridAdapter.GridClickListener {
     private static List<Movie> mMovies;
-    private static Drawable mPlaceholder;
 
     private static int mSortState;
     private static boolean mTransitioningSort;
@@ -91,30 +89,29 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         mContext = this;
         mListener = this;
 
-        mPlaceholder = getResources().getDrawable(R.drawable.poster_not_found);
         mStatusBarHeight = getStatusBarHeight();
     }
 
     static void postMovieRetrieval() {
         if(mMovies != null) {
             int length = mMovies.size();
-            Drawable [] images = new Drawable[length];
-            Drawable currentDrawable;
+            String [] images = new String[length];
+            String currentImageUrl;
             for(int i = 0; i < length; i++) {
                 Movie movie = mMovies.get(i);
 
-                currentDrawable = movie.getImageSmall();
-                if(currentDrawable != null) {
-                    images[i] = currentDrawable;
+                currentImageUrl = movie.getImageUrl();
+                if(currentImageUrl != null && !currentImageUrl.equals("null")) {
+                    images[i] = currentImageUrl;
                 } else {
-                    images[i] = mPlaceholder;
+                    images[i] = "";
                 }
             }
 
             int spanCount = (mOrientation == Configuration.ORIENTATION_LANDSCAPE ? 5 : 3);
             GridLayoutManager layoutManager = new GridLayoutManager(mContext, spanCount);
             mGridRecyclerView.setLayoutManager(layoutManager);
-            GridAdapter adapter = new GridAdapter(images, mListener);
+            GridAdapter adapter = new GridAdapter(images, mListener, ENUM_IMAGE_0342);
             mGridRecyclerView.setAdapter(adapter);
 
             mTransitioningSort = false;

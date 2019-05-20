@@ -1,7 +1,7 @@
 package com.example.popularmovies;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,17 +9,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.popularmovies.utils.HttpManipulator;
+import com.squareup.picasso.Picasso;
+
 public class GridAdapter extends RecyclerView.Adapter<GridAdapter.MovieViewHolder> {
     private final GridClickListener mListener;
 
     private int mItemCount;
+    private int mImageSize;
 
-    private Drawable[] mImages;
+    private String[] mImages;
 
-    GridAdapter(Drawable [] images, GridClickListener listener) {
+
+    GridAdapter(String [] images, GridClickListener listener, int imageSize) {
         mItemCount = images.length;
         mListener = listener;
         mImages = images;
+        mImageSize = imageSize;
     }
 
     @NonNull
@@ -57,7 +63,8 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.MovieViewHolde
         }
 
         void bind(int position){
-            mMovieView.setImageDrawable(mImages[position]);
+            Uri imageUri = HttpManipulator.getImageUri(mImages[position], mImageSize);
+            Picasso.get().load(imageUri).placeholder(R.drawable.poster_not_found).into(mMovieView);
         }
 
         @Override

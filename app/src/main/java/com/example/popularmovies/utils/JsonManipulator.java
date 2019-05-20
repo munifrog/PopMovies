@@ -1,8 +1,5 @@
 package com.example.popularmovies.utils;
 
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-
 import com.example.popularmovies.model.Movie;
 
 import org.json.JSONArray;
@@ -12,8 +9,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import static com.example.popularmovies.MovieConst.ENUM_IMAGE_0185;
 
 public class JsonManipulator {
     private static final String MOVIE_SORT_RESULTS   = "results";
@@ -47,17 +42,11 @@ public class JsonManipulator {
                     if(imagePath == null) {
                         imagePath = object.getString(MOVIE_IMAGE_PATH_ALT);
                     }
-                    Drawable imageDrawable;
                     if(imagePath != null && !imagePath.equals("null")) {
                         if(imagePath.startsWith("/")) {
                             // Leading slash is unnecessary and is easier to process when absent
                             imagePath = imagePath.substring(1);
                         }
-                        Uri imageUri = HttpManipulator.getImageUri(imagePath, ENUM_IMAGE_0185);
-                        imageDrawable = HttpManipulator.getImage(HttpManipulator.uri2url(imageUri));
-                    } else {
-                        // Replace with alternate image later ...
-                        imageDrawable = null;
                     }
 
                     // The release date is not always provided; process carefully
@@ -88,7 +77,6 @@ public class JsonManipulator {
                                     currentTitle,
                                     originalTitle,
                                     imagePath,
-                                    imageDrawable,
                                     overview,
                                     votePerOne,
                                     releaseDate
