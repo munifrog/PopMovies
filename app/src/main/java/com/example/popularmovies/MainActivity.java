@@ -108,7 +108,8 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
                 }
             }
 
-            int spanCount = (mOrientation == Configuration.ORIENTATION_LANDSCAPE ? 5 : 3);
+            int spanCount = (mOrientation == Configuration.ORIENTATION_LANDSCAPE ?
+                    PREF_SPAN_LANDSCAPE : PREF_SPAN_PORTRAIT);
             GridLayoutManager layoutManager = new GridLayoutManager(mContext, spanCount);
             mGridRecyclerView.setLayoutManager(layoutManager);
             GridAdapter adapter = new GridAdapter(images, mListener, ENUM_IMAGE_0342);

@@ -15,6 +15,9 @@ public interface MovieConst {
     int ENUM_IMAGE_0500 = 500;
     int ENUM_IMAGE_0780 = 780;
 
+    int PREF_SPAN_LANDSCAPE = 4;
+    int PREF_SPAN_PORTRAIT = 2;
+
     String TMDB_API_KEY           = "PLACEHOLDER";
 
     String ENTIRE_PARCELLED_MOVIE = "movie_entire";
