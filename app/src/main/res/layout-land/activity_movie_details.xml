@@ -11,7 +11,7 @@
         android:id="@+id/iv_movie_poster"
         android:layout_height="match_parent"
         android:layout_width="wrap_content"
-        android:src="@drawable/avengers"
+        android:src="@drawable/poster_not_found"
         android:adjustViewBounds="true"
         android:background="@color/colorBackground"
         android:contentDescription="@string/image_description"
@@ -33,8 +33,7 @@
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraint"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/tv_name"
@@ -51,13 +50,25 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:id="@+id/tv_name_alt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="end|center_vertical"
+                android:text="@string/sample_text_title_alt"
+                android:textColor="@color/colorText"
+                android:textSize="@dimen/text_title_height"
+                app:layout_constraintEnd_toEndOf="@+id/tv_name"
+                app:layout_constraintStart_toStartOf="@id/tv_name"
+                app:layout_constraintTop_toBottomOf="@id/tv_name" />
+
+            <TextView
                 android:id="@+id/tv_average"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sample_text_average"
                 android:textColor="@color/colorText"
                 android:textSize="@dimen/text_average_height"
-                app:layout_constraintBottom_toBottomOf="@+id/tv_name"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_name_alt"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/tv_name" />
 
@@ -70,7 +81,7 @@
                 android:textColor="@color/colorText"
                 android:textSize="@dimen/text_date_height"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_name" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_name_alt" />
 
             <TextView
                 android:id="@+id/tv_plot"

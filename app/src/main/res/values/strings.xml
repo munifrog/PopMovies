@@ -1,14 +1,18 @@
 <resources>
     <string name="app_name">Popular Movies</string>
-    <!--Put the disclaimer in the About menu item-->
+
     <string name="tmdb_attribution">This product uses the TMDb API but is not endorsed or certified by TMDb</string>
 
     <string name="image_description">Movie Poster</string>
 
     <string name="format_release_date">%2$s %3$d</string>
     <string name="format_average">(%1$d%%)</string>
+    <string name="format_title_alternate">[Original: %1$s]</string>
+
+    <string name="unknown_release_date">Release date: Unknown</string>
 
     <string name="sample_text_title">Movie Title</string>
+    <string name="sample_text_title_alt">[Alternate Movie Title]</string>
     <string name="sample_text_date">March 2019</string>
     <string name="sample_text_average">86%</string>
     <string name="sample_text_overview">Description</string>
@@ -17,8 +21,8 @@
     <string name="action_popularity">Popular</string>
     <string name="action_rating">Liked</string>
 
-    <string name="sort_ctx_popular">Most Popular Movies</string>
-    <string name="sort_ctx_rating">Highest Rated Movies</string>
+    <string name="sort_ctx_popular">Current Most Popular</string>
+    <string name="sort_ctx_rating">Highest Rated</string>
 
     <string-array name="months">
         <item >January</item>
