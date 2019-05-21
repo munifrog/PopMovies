@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+    <!--android:layout_gravity="fill|center"-->
 <ImageView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/iv_movie"
-    android:layout_gravity="fill_horizontal"
+    android:contentDescription="@string/image_description"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:scaleType="fitCenter"/>
+    android:scaleType="centerCrop"/>
