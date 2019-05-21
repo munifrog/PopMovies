@@ -21,6 +21,7 @@ public interface MovieConst {
     String TMDB_API_KEY           = "PLACEHOLDER";
 
     String ENTIRE_PARCELLED_MOVIE = "movie_entire";
+    String ENTIRE_MOVIE_ARRAY     = "movie_array";
 
     String SETTINGS_FILE          = "pop_movie_settings";
     String SETTINGS_SORT_LAST     = "last_sort";

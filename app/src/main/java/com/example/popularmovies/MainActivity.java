@@ -21,11 +21,11 @@ import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utils.HttpManipulator;
 import com.example.popularmovies.utils.JsonManipulator;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MovieConst,
         GridAdapter.GridClickListener {
-    private static List<Movie> mMovies;
+    private static ArrayList<Movie> mMovies;
 
     private static int mSortState;
     private static boolean mTransitioningSort;
@@ -79,8 +79,13 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
 
         mProgressBar = findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.INVISIBLE);
-        restoreState();
-        sortByCurrentChoice();
+        restorePreferences();
+        if(savedInstanceState != null) {
+            // https://stackoverflow.com/questions/10953121/android-arraylistmyobject-pass-as-parcelable
+            mMovies = savedInstanceState.getParcelableArrayList(ENTIRE_MOVIE_ARRAY);
+        } else {
+            sortByCurrentChoice();
+        }
 
         // Orientation detection described here:
         // https://stackoverflow.com/questions/2795833/check-orientation-on-android-phone
@@ -90,6 +95,10 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         mListener = this;
 
         mStatusBarHeight = getStatusBarHeight();
+
+        if(savedInstanceState != null) {
+            postMovieRetrieval();
+        }
     }
 
     static void postMovieRetrieval() {
@@ -138,20 +147,11 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         return result;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        saveState();
-        // Try to avoid warned memory leak
-        mToolbar = null;
-        mProgressBar = null;
-    }
-
     // URL <= Input params; Void <= progress; List<Movie> <= result
-    static class SortedMovieDiscoverer extends AsyncTask<Uri, Void, List<Movie>> {
+    static class SortedMovieDiscoverer extends AsyncTask<Uri, Void, ArrayList<Movie>> {
         @Override
-        protected List<Movie> doInBackground(Uri... uris) {
-            List<Movie> movies = null;
+        protected ArrayList<Movie> doInBackground(Uri... uris) {
+            ArrayList<Movie> movies = null;
             try {
                 Uri uri = uris[0];
                 String json = HttpManipulator.getResponse(HttpManipulator.uri2url(uri));
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         }
 
         @Override
-        protected void onPostExecute(List<Movie> movies) {
+        protected void onPostExecute(ArrayList<Movie> movies) {
             super.onPostExecute(movies);
             mMovies = movies;
             postMovieRetrieval();
@@ -239,15 +239,24 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
 
     // I've done this before but I usually forget the details; Refreshed my memory with this site:
     // https://stackoverflow.com/questions/10209814/saving-user-information-in-app-settings
-    private void saveState() {
+    private void savePreferences() {
         SharedPreferences preferences = getSharedPreferences(SETTINGS_FILE, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(SETTINGS_SORT_LAST, mSortState);
         editor.apply();
     }
 
-    private void restoreState() {
+    private void restorePreferences() {
         SharedPreferences preferences = getSharedPreferences(SETTINGS_FILE, MODE_PRIVATE);
         mSortState = preferences.getInt(SETTINGS_SORT_LAST, ENUM_SORT_POPULARITY_DESCENDING);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // https://stackoverflow.com/questions/10953121/android-arraylistmyobject-pass-as-parcelable
+        // https://stackoverflow.com/questions/12793069/android-onsaveinstancestate-not-being-called-from-activity
+        outState.putParcelableArrayList(ENTIRE_MOVIE_ARRAY, mMovies);
+        savePreferences();
     }
 }

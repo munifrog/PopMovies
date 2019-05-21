@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 public class JsonManipulator {
     private static final String MOVIE_SORT_RESULTS   = "results";
@@ -20,8 +19,8 @@ public class JsonManipulator {
     private static final String MOVIE_RELEASE_DATE   = "release_date";
     private static final String MOVIE_VOTE_PER_TEN   = "vote_average";
 
-    public static List<Movie> extractMoviesFromJson(String json) {
-        List<Movie> movies = new ArrayList<>();
+    public static ArrayList<Movie> extractMoviesFromJson(String json) {
+        ArrayList<Movie> movies = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(json);
 
