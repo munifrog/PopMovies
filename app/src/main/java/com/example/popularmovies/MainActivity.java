@@ -40,6 +40,13 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
     private static GridAdapter.GridClickListener mListener;
     private static int mStatusBarHeight;
 
+    private static final String INDICATE_STATUS_BAR = "status_bar_height";
+    private static final String INDICATE_DIMENSION  = "dimen";
+    private static final String INDICATE_PACAKGE    = "android";
+
+    private static final String STRING_NULL_BUT_NOT = "null";
+    private static final String STRING_EMPTY        = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         });
 
         mProgressBar = findViewById(R.id.progressBar);
-        mProgressBar.setVisibility(View.INVISIBLE);
+        showProgressBar();
         restorePreferences();
         if(savedInstanceState != null) {
             // https://stackoverflow.com/questions/10953121/android-arraylistmyobject-pass-as-parcelable
@@ -110,10 +117,10 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
                 Movie movie = mMovies.get(i);
 
                 currentImageUrl = movie.getImageUrl();
-                if(currentImageUrl != null && !currentImageUrl.equals("null")) {
+                if(currentImageUrl != null && !currentImageUrl.equals(STRING_NULL_BUT_NOT)) {
                     images[i] = currentImageUrl;
                 } else {
-                    images[i] = "";
+                    images[i] = STRING_EMPTY;
                 }
             }
 
@@ -125,22 +132,23 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
             mGridRecyclerView.setAdapter(adapter);
 
             mTransitioningSort = false;
-            mProgressBar.setVisibility(View.INVISIBLE);
 
             mGridRecyclerView.setPadding(0, mStatusBarHeight,0,0);
         } else {
             Toast.makeText(mContext, R.string.error_internet_failure, Toast.LENGTH_LONG).show();
         }
+        showProgressBar();
     }
 
     // https://stackoverflow.com/questions/20584325/reliably-get-height-of-status-bar-to-solve-kitkat-translucent-navigation-issue
     private int getStatusBarHeight() {
         int result = 0;
         int resId = getResources().getIdentifier(
-                "status_bar_height",
-                "dimen",
-                "android"
+                INDICATE_STATUS_BAR,
+                INDICATE_DIMENSION,
+                INDICATE_PACAKGE
         );
+
         if (resId > 0) {
             result = getResources().getDimensionPixelSize(resId);
         }
@@ -158,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
                 movies = JsonManipulator.extractMoviesFromJson(json);
             } catch (RuntimeException e) {
                 // Internet unavailable
+                mTransitioningSort = false;
             }
             return movies;
         }
@@ -225,10 +234,14 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         }
     }
 
+    private static void showProgressBar() {
+        mProgressBar.setVisibility(mTransitioningSort ? View.VISIBLE : View.INVISIBLE);
+    }
+
     private void sortByCurrentChoice() {
         if (!mTransitioningSort) {
             mTransitioningSort = true;
-            mProgressBar.setVisibility(View.VISIBLE);
+            showProgressBar();
             if (mSortState == ENUM_SORT_AVERAGE_RATING_DESCENDING) {
                 sortByRatings();
             } else if (mSortState == ENUM_SORT_POPULARITY_DESCENDING) {
