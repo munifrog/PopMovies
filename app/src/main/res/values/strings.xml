@@ -9,7 +9,7 @@
 
     <string name="format_release_date">%2$s %3$d</string>
     <string name="format_average">(%1$d%%)</string>
-    <string name="format_title_alternate">[Original: %1$s]</string>
+    <string name="format_title_alternate">Original: %1$s</string>
 
     <string name="unknown_release_date">Release date: Unknown</string>
 
