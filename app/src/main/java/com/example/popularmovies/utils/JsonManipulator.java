@@ -11,6 +11,7 @@ import java.util.Calendar;
 
 public class JsonManipulator {
     private static final String MOVIE_SORT_RESULTS   = "results";
+    private static final String MOVIE_ID_TMDB        = "id";
     private static final String MOVIE_TITLE_CURRENT  = "title";
     private static final String MOVIE_TITLE_ORIGINAL = "original_title";
     private static final String MOVIE_OVERVIEW       = "overview";
@@ -30,6 +31,8 @@ public class JsonManipulator {
                 JSONObject object;
                 for(int i = 0; i < length; i++) {
                     object = (JSONObject) movieArray.get(i);
+
+                    long idTmdb = object.getLong(MOVIE_ID_TMDB);
 
                     // These are allowed to be empty strings ("")
                     String originalTitle = object.getString(MOVIE_TITLE_ORIGINAL);
@@ -73,6 +76,7 @@ public class JsonManipulator {
 
                     movies.add(
                             new Movie(
+                                    idTmdb,
                                     currentTitle,
                                     originalTitle,
                                     imagePath,

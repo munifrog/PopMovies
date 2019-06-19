@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import java.util.Calendar;
 
 public class Movie implements Parcelable {
+    private long mTmdbId;
     private String mTitleCurrent;
     private String mTitleOriginal;
     private String mImagePath;
@@ -15,6 +16,7 @@ public class Movie implements Parcelable {
 
     private Movie (Parcel parcel) {
         // Note these must appear in same order as writeToParcel that creates the Parcel
+        mTmdbId = parcel.readLong();
         mTitleCurrent = parcel.readString();
         mTitleOriginal = parcel.readString();
         mImagePath = parcel.readString();
@@ -30,6 +32,7 @@ public class Movie implements Parcelable {
     }
 
     public Movie(
+            long id,
             String titleCurrent,
             String titleOriginal,
             String imagePath,
@@ -37,6 +40,7 @@ public class Movie implements Parcelable {
             float rating,
             Calendar releaseDate)
     {
+        mTmdbId = id;
         mTitleCurrent = titleCurrent;
         mTitleOriginal = titleOriginal;
         mImagePath = imagePath;
@@ -44,6 +48,9 @@ public class Movie implements Parcelable {
         mRating = rating;
         mReleaseDate = releaseDate;
     }
+
+    public long getTmdbId() { return this.mTmdbId; }
+    public void setTmdbId(long newId) { this.mTmdbId = newId; }
 
     public String getTitleCurrent() { return this.mTitleCurrent; }
     public void setTitleCurrent(String newTitle) { this.mTitleCurrent = newTitle; }
@@ -71,6 +78,7 @@ public class Movie implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         // Note these must appear in same order as constructor that takes Parcel
+        parcel.writeLong(mTmdbId);
         parcel.writeString(mTitleCurrent);
         parcel.writeString(mTitleOriginal);
         parcel.writeString(mImagePath);
