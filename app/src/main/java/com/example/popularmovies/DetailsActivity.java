@@ -14,7 +14,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 
-public class MovieDetailsActivity extends AppCompatActivity implements MovieConst {
+public class DetailsActivity extends AppCompatActivity implements MovieConst {
     private static Movie mMovie;
 
     @Override

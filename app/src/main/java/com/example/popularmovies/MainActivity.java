@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
     private void launchDetails(int index) {
         if(mMovies != null && index > -1 && index < MAX_MOVIES_RETRIEVED) {
             Movie movie = mMovies.get(index);
-            Intent intent = new Intent(this, MovieDetailsActivity.class);
+            Intent intent = new Intent(this, DetailsActivity.class);
             intent.putExtra(ENTIRE_PARCELLED_MOVIE, movie);
             startActivity(intent);
         }
