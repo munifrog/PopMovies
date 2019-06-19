@@ -6,6 +6,9 @@ import android.os.Parcelable;
 import java.util.Calendar;
 
 public class Movie implements Parcelable {
+    private static final int FAVORITE_ON = 0;
+    private static final int FAVORITE_OFF = 1;
+
     private long mTmdbId;
     private String mTitleCurrent;
     private String mTitleOriginal;
@@ -13,6 +16,7 @@ public class Movie implements Parcelable {
     private String mOverview;
     private float mRating;
     private Calendar mReleaseDate;
+    private boolean mFavorite;
 
     private Movie (Parcel parcel) {
         // Note these must appear in same order as writeToParcel that creates the Parcel
@@ -29,6 +33,7 @@ public class Movie implements Parcelable {
         mReleaseDate.set(Calendar.MONTH, month);
         int date = parcel.readInt();
         mReleaseDate.set(Calendar.DATE, date);
+        mFavorite = parcel.readInt() == FAVORITE_ON;
     }
 
     public Movie(
@@ -70,6 +75,9 @@ public class Movie implements Parcelable {
     public Calendar getRelease() { return this.mReleaseDate; }
     public void setRelease(Calendar newReleaseDate) { this.mReleaseDate = newReleaseDate; }
 
+    public boolean getFavorite() { return this.mFavorite; }
+    public void setFavorite(boolean newFavorite) { this.mFavorite = newFavorite; }
+
     @Override
     public int describeContents() {
         return 0;
@@ -87,6 +95,8 @@ public class Movie implements Parcelable {
         parcel.writeInt(mReleaseDate.get(Calendar.YEAR));
         parcel.writeInt(mReleaseDate.get(Calendar.MONTH));
         parcel.writeInt(mReleaseDate.get(Calendar.DATE));
+        // See https://stackoverflow.com/questions/6201311/how-to-read-write-a-boolean-when-implementing-the-parcelable-interface
+        parcel.writeInt(mFavorite ? FAVORITE_ON : FAVORITE_OFF);
     }
 
     static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {

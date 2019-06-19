@@ -5,4 +5,5 @@
     <dimen name="text_date_height">32sp</dimen>
     <dimen name="text_average_height">22sp</dimen>
     <dimen name="text_plot_height">28sp</dimen>
+    <dimen name="icon_favorite_height">56dp</dimen>
 </resources>

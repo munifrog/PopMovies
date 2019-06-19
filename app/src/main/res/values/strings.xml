@@ -4,6 +4,7 @@
     <string name="tmdb_attribution">This product uses the TMDb API but is not endorsed or certified by TMDb</string>
 
     <string name="image_description">Movie Poster</string>
+    <string name="favorite_description">Favorite Movie</string>
 
     <string name="error_internet_failure">Internet unavailable. Turn on internet to try again.</string>
 

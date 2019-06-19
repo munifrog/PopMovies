@@ -97,6 +97,21 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_release" />
+
+            <ImageView
+                android:id="@+id/iv_favorite"
+                android:layout_width="@dimen/icon_favorite_height"
+                android:layout_height="@dimen/icon_favorite_height"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:onClick="toggleFavorite"
+                android:alpha="0.5"
+                android:contentDescription="@string/favorite_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_plot"
+                app:srcCompat="@android:drawable/star_big_off" />
+
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
 
