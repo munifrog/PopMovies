@@ -64,7 +64,15 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.MovieViewHolde
 
         void bind(int position){
             Uri imageUri = HttpManipulator.getImageUri(mImages[position], mImageSize);
-            Picasso.get().load(imageUri).placeholder(R.drawable.poster_not_found).into(mMovieView);
+            // COMPLETED: Your app might crash when passing null/empty/malformed Urls. Check your path
+            //  url before loading the image. [https://github.com/square/picasso/issues/609]
+            //  You can also use the additional option error and placeholder in Picasso here to
+            //  avoid crashing (error also takes a drawable image)
+            if (imageUri != null && imageUri.getPath() != null && !imageUri.getPath().isEmpty()) {
+                Picasso.get().load(imageUri).placeholder(R.drawable.poster_not_found).into(mMovieView);
+            } else {
+                mMovieView.setImageResource(R.drawable.poster_not_found);
+            }
         }
 
         @Override
