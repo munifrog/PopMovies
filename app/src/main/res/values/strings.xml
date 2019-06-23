@@ -5,8 +5,10 @@
 
     <string name="image_description">Movie Poster</string>
     <string name="favorite_description">Favorite Movie</string>
+    <string name="trailers_description">Launch Trailers</string>
+    <string name="reviews_description">Launch Reviews</string>
 
-    <string name="error_internet_failure">Internet unavailable. Turn on internet to try again.</string>
+    <string name="error_internet_failure">Internet unavailable. Try favorites or else turn on internet to try again.</string>
 
     <string name="format_release_date">%2$s %3$d</string>
     <string name="format_average">(%1$d%%)</string>
@@ -21,9 +23,11 @@
     <string name="sample_text_overview">Description</string>
 
     <string name="action_about">About</string>
+    <string name="action_favorites">Favorites</string>
     <string name="action_popularity">Popular</string>
-    <string name="action_rating">Liked</string>
+    <string name="action_rating">Highly Rated</string>
 
+    <string name="sort_ctx_favorite">Favorites</string>
     <string name="sort_ctx_popular">Current Most Popular</string>
     <string name="sort_ctx_rating">Highest Rated</string>
 

@@ -1,12 +1,16 @@
 package com.example.popularmovies;
 
+import java.util.Calendar;
+
 public interface MovieConst {
     // This site suggested using an interface instead of a class:
     // https://stackoverflow.com/questions/3866190/java-constants-file
     int MAX_MOVIES_RETRIEVED = 20;
 
-    int ENUM_SORT_POPULARITY_DESCENDING = 0;
-    int ENUM_SORT_AVERAGE_RATING_DESCENDING = 1;
+    int ENUM_STATE_POPULAR = 0;
+    int ENUM_STATE_RATING = 1;
+    int ENUM_STATE_FAVORITE = 2;
+
     int ENUM_IMAGE_ORIG = 0;
     int ENUM_IMAGE_0092 = 92;
     int ENUM_IMAGE_0154 = 154;
@@ -22,6 +26,15 @@ public interface MovieConst {
 
     String ENTIRE_PARCELLED_MOVIE = "movie_entire";
     String ENTIRE_MOVIE_ARRAY     = "movie_array";
+
+    String MOVIE_ID               = "movie_id";
+    String MOVIE_TITLE_LOCAL      = "movie_title_local";
+    String MOVIE_TITLE_ORIG       = "movie_title_original";
+    String MOVIE_IMAGE_PATH       = "movie_image_path";
+    String MOVIE_OVERVIEW         = "movie_overview";
+    String MOVIE_RATING           = "movie_rating";
+    String MOVIE_RELEASE          = "movie_release";
+    String MOVIE_STATE            = "movie_state";
 
     String SETTINGS_FILE          = "pop_movie_settings";
     String SETTINGS_SORT_LAST     = "last_sort";

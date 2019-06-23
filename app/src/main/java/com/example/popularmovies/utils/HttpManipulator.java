@@ -88,13 +88,13 @@ public class HttpManipulator {
     public static Uri getSortedUri(int sortBy, int page) {
         Uri uri = null;
         switch(sortBy) {
-            case MovieConst.ENUM_SORT_POPULARITY_DESCENDING:
+            case MovieConst.ENUM_STATE_POPULAR:
                 uri = getSortedBase()
                         .appendQueryParameter(TMDB_API_Q_SORT, TMDB_API_V_SORT_POPULARITY)
                         .appendQueryParameter(TMDB_API_Q_PAGE, String.valueOf(page))
                         .build();
                 break;
-            case MovieConst.ENUM_SORT_AVERAGE_RATING_DESCENDING:
+            case MovieConst.ENUM_STATE_RATING:
                 uri = getSortedBase()
                         .appendQueryParameter(TMDB_API_Q_SORT, TMDB_API_V_SORT_RATING)
                         .appendQueryParameter(TMDB_API_Q_PAGE, String.valueOf(page))

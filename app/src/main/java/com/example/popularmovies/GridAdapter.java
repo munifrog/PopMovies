@@ -15,16 +15,12 @@ import com.squareup.picasso.Picasso;
 public class GridAdapter extends RecyclerView.Adapter<GridAdapter.MovieViewHolder> {
     private final GridClickListener mListener;
 
-    private int mItemCount;
     private int mImageSize;
-
     private String[] mImages;
 
-
-    GridAdapter(String [] images, GridClickListener listener, int imageSize) {
-        mItemCount = images.length;
+    GridAdapter(GridClickListener listener, int imageSize) {
+        // The adapter only needs the images to do its job
         mListener = listener;
-        mImages = images;
         mImageSize = imageSize;
     }
 
@@ -46,7 +42,11 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.MovieViewHolde
 
     @Override
     public int getItemCount() {
-        return mItemCount;
+        if(mImages == null) {
+            return 0;
+        } else {
+            return mImages.length;
+        }
     }
 
     public interface GridClickListener {
@@ -80,5 +80,10 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.MovieViewHolde
             int position = getAdapterPosition();
             mListener.onClick(position);
         }
+    }
+
+    void setMovieImages(String [] images) {
+        mImages = images;
+        notifyDataSetChanged();
     }
 }

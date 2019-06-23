@@ -1,11 +1,11 @@
 package com.example.popularmovies;
 
-import android.content.Context;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.Uri;
-import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -17,34 +17,25 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.popularmovies.model.CalendarConverter;
 import com.example.popularmovies.model.Movie;
-import com.example.popularmovies.utils.HttpManipulator;
-import com.example.popularmovies.utils.JsonManipulator;
+import com.example.popularmovies.model.MovieViewModel;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieConst,
         GridAdapter.GridClickListener {
-    private static ArrayList<Movie> mMovies;
-
-    private static int mSortState;
     private static boolean mTransitioningSort;
-    private static android.support.v7.widget.Toolbar mToolbar;
-    private static ProgressBar mProgressBar;
+    private static MenuItem mFaveItem;
     private static MenuItem mPopItem;
     private static MenuItem mRateItem;
-
-    private static int mOrientation;
-    private static RecyclerView mGridRecyclerView;
-    private static Context mContext;
-    private static GridAdapter.GridClickListener mListener;
-    private static int mStatusBarHeight;
+    private static GridAdapter mAdapter;
+    private static MovieViewModel mViewModel;
 
     private static final String INDICATE_STATUS_BAR = "status_bar_height";
     private static final String INDICATE_DIMENSION  = "dimen";
-    private static final String INDICATE_PACAKGE    = "android";
-
-    private static final String STRING_NULL_BUT_NOT = "null";
+    private static final String INDICATE_PACKAGE    = "android";
+    private static final String STRING_NOMINALLY_NULL = "null";
     private static final String STRING_EMPTY        = "";
 
     @Override
@@ -52,17 +43,19 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTransitioningSort = false;
+        mTransitioningSort = true;
+        setupViewModel();
 
         // Alternate Toolbar demonstrated at
         // https://stackoverflow.com/questions/35648913/how-to-set-menu-to-toolbar-in-android
-        mToolbar = findViewById(R.id.toolbar);
-        mToolbar.inflateMenu(R.menu.main);
-        Menu menu = mToolbar.getMenu();
+        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.inflateMenu(R.menu.main);
+        Menu menu = toolbar.getMenu();
+        mFaveItem = menu.findItem(R.id.action_sort_favorites);
         mPopItem = menu.findItem(R.id.action_sort_popularity);
         mRateItem = menu.findItem(R.id.action_sort_rating);
         showSortByMenuItem();
-        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 int action = item.getItemId();
@@ -70,13 +63,14 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
                     case R.id.action_about:
                         showAboutInfo();
                         return true;
+                    case R.id.action_sort_favorites:
+                        sortByCurrentChoice(ENUM_STATE_FAVORITE);
+                        return true;
                     case R.id.action_sort_popularity:
-                        alternateMenuState();
-                        sortByCurrentChoice();
+                        sortByCurrentChoice(ENUM_STATE_POPULAR);
                         return true;
                     case R.id.action_sort_rating:
-                        alternateMenuState();
-                        sortByCurrentChoice();
+                        sortByCurrentChoice(ENUM_STATE_RATING);
                         return true;
                 }
 
@@ -84,60 +78,63 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
             }
         });
 
-        mProgressBar = findViewById(R.id.progressBar);
-        showProgressBar();
-        restorePreferences();
-        if(savedInstanceState != null) {
-            // https://stackoverflow.com/questions/10953121/android-arraylistmyobject-pass-as-parcelable
-            mMovies = savedInstanceState.getParcelableArrayList(ENTIRE_MOVIE_ARRAY);
-        } else {
-            sortByCurrentChoice();
-        }
-
         // Orientation detection described here:
         // https://stackoverflow.com/questions/2795833/check-orientation-on-android-phone
-        mOrientation = getResources().getConfiguration().orientation;
-        mGridRecyclerView = findViewById(R.id.rv_grid);
-        mContext = this;
-        mListener = this;
+        int spanCount = (getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE ?
+                PREF_SPAN_LANDSCAPE :
+                PREF_SPAN_PORTRAIT
+        );
 
-        mStatusBarHeight = getStatusBarHeight();
-
-        if(savedInstanceState != null) {
-            postMovieRetrieval();
-        }
+        RecyclerView gridRecyclerView = findViewById(R.id.rv_grid);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
+        gridRecyclerView.setLayoutManager(layoutManager);
+        mAdapter = new GridAdapter(this, ENUM_IMAGE_0342);
+        gridRecyclerView.setAdapter(mAdapter);
+        gridRecyclerView.setPadding(0, getStatusBarHeight(),0,0);
     }
 
-    static void postMovieRetrieval() {
-        if(mMovies != null) {
-            int length = mMovies.size();
-            String [] images = new String[length];
-            String currentImageUrl;
-            for(int i = 0; i < length; i++) {
-                Movie movie = mMovies.get(i);
+    private void updateAdapterWithNewMovieSet() {
+        if (mViewModel.getMovies() != null) {
+            List<Movie> movies = mViewModel.getMovies();
+            if (movies != null) {
+                int length = mViewModel.getMovies().size();
+                String[] images = new String[length];
+                String currentImageUrl;
+                for (int i = 0; i < length; i++) {
+                    Movie movie = movies.get(i);
+                    currentImageUrl = movie.getImagePath();
+                    if (currentImageUrl != null && !currentImageUrl.equals(STRING_NOMINALLY_NULL)) {
+                        images[i] = currentImageUrl;
+                    } else {
+                        images[i] = STRING_EMPTY;
+                    }
+                }
+                mAdapter.setMovieImages(images);
+            } else {
+                Toast.makeText(this, R.string.error_internet_failure, Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(this, R.string.error_internet_failure, Toast.LENGTH_LONG).show();
+        }
+        mTransitioningSort = false;
+    }
 
-                currentImageUrl = movie.getImageUrl();
-                if(currentImageUrl != null && !currentImageUrl.equals(STRING_NULL_BUT_NOT)) {
-                    images[i] = currentImageUrl;
-                } else {
-                    images[i] = STRING_EMPTY;
+    private void setupViewModel() {
+        mViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+        retrieveMovies();
+    }
+
+    public void retrieveMovies() {
+        mViewModel.getLiveMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                if(movies != null) {
+                    updateAdapterWithNewMovieSet();
+                    showWaitingBar();
                 }
             }
-
-            int spanCount = (mOrientation == Configuration.ORIENTATION_LANDSCAPE ?
-                    PREF_SPAN_LANDSCAPE : PREF_SPAN_PORTRAIT);
-            GridLayoutManager layoutManager = new GridLayoutManager(mContext, spanCount);
-            mGridRecyclerView.setLayoutManager(layoutManager);
-            GridAdapter adapter = new GridAdapter(images, mListener, ENUM_IMAGE_0342);
-            mGridRecyclerView.setAdapter(adapter);
-
-            mTransitioningSort = false;
-
-            mGridRecyclerView.setPadding(0, mStatusBarHeight,0,0);
-        } else {
-            Toast.makeText(mContext, R.string.error_internet_failure, Toast.LENGTH_LONG).show();
-        }
-        showProgressBar();
+        });
     }
 
     // https://stackoverflow.com/questions/20584325/reliably-get-height-of-status-bar-to-solve-kitkat-translucent-navigation-issue
@@ -146,49 +143,13 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         int resId = getResources().getIdentifier(
                 INDICATE_STATUS_BAR,
                 INDICATE_DIMENSION,
-                INDICATE_PACAKGE
+                INDICATE_PACKAGE
         );
 
         if (resId > 0) {
             result = getResources().getDimensionPixelSize(resId);
         }
         return result;
-    }
-
-    // URL <= Input params; Void <= progress; List<Movie> <= result
-    static class SortedMovieDiscoverer extends AsyncTask<Uri, Void, ArrayList<Movie>> {
-        @Override
-        protected ArrayList<Movie> doInBackground(Uri... uris) {
-            ArrayList<Movie> movies = null;
-            try {
-                Uri uri = uris[0];
-                String json = HttpManipulator.getResponse(HttpManipulator.uri2url(uri));
-                movies = JsonManipulator.extractMoviesFromJson(json);
-            } catch (RuntimeException e) {
-                // Internet unavailable
-                mTransitioningSort = false;
-            }
-            return movies;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Movie> movies) {
-            super.onPostExecute(movies);
-            mMovies = movies;
-            postMovieRetrieval();
-        }
-    }
-
-    private void sortByPopularity() {
-        // Should only be called by sortByCurrentChoice()
-        Uri uri = HttpManipulator.getSortedUri(0, 1);
-        new SortedMovieDiscoverer().execute(uri);
-    }
-
-    private void sortByRatings() {
-        // Should only be called by sortByCurrentChoice()
-        Uri uri = HttpManipulator.getSortedUri(1, 1);
-        new SortedMovieDiscoverer().execute(uri);
     }
 
     private void showAboutInfo() {
@@ -201,52 +162,51 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
     }
 
     private void launchDetails(int index) {
-        if(mMovies != null && index > -1 && index < MAX_MOVIES_RETRIEVED) {
-            Movie movie = mMovies.get(index);
+        if(index > -1 && index < MAX_MOVIES_RETRIEVED && mViewModel.getMovies() != null) {
+            Movie movie = mViewModel.getMovies().get(index);
             Intent intent = new Intent(this, DetailsActivity.class);
-            intent.putExtra(ENTIRE_PARCELLED_MOVIE, movie);
+            intent.putExtra(MOVIE_ID, movie.getId());
+            intent.putExtra(MOVIE_TITLE_LOCAL, movie.getTitleCurrent());
+            intent.putExtra(MOVIE_TITLE_ORIG, movie.getTitleOriginal());
+            intent.putExtra(MOVIE_IMAGE_PATH, movie.getImagePath());
+            intent.putExtra(MOVIE_OVERVIEW, movie.getOverview());
+            intent.putExtra(MOVIE_RATING, movie.getRating());
+            intent.putExtra(MOVIE_RELEASE, CalendarConverter.convertToLong(movie.getRelease()));
             startActivity(intent);
         }
     }
 
-    private void alternateMenuState() {
-        if (!mTransitioningSort) {
-            if (mSortState == ENUM_SORT_AVERAGE_RATING_DESCENDING) {
-                mSortState = ENUM_SORT_POPULARITY_DESCENDING;
-                showSortByMenuItem();
-            } else if (mSortState == ENUM_SORT_POPULARITY_DESCENDING) {
-                mSortState = ENUM_SORT_AVERAGE_RATING_DESCENDING;
-                showSortByMenuItem();
-            }
-
-        }
-    }
-
-    private static void showSortByMenuItem() {
-        if (mSortState == ENUM_SORT_AVERAGE_RATING_DESCENDING) {
-            mToolbar.setTitle(R.string.sort_ctx_rating);
+    private void showSortByMenuItem() {
+        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        int currentState = mViewModel.getState();
+        if (currentState == ENUM_STATE_RATING) {
+            toolbar.setTitle(R.string.sort_ctx_rating);
+            mFaveItem.setVisible(true);
             mPopItem.setVisible(true);
-            mRateItem.setVisible(false);
-        } else if (mSortState == ENUM_SORT_POPULARITY_DESCENDING) {
-            mToolbar.setTitle(R.string.sort_ctx_popular);
-            mPopItem.setVisible(false);
+            mRateItem.setVisible(false); // No need to see self as an option to change to
+        } else if (currentState == ENUM_STATE_POPULAR) {
+            toolbar.setTitle(R.string.sort_ctx_popular);
+            mFaveItem.setVisible(true);
+            mPopItem.setVisible(false); // No need to see self as an option to change to
+            mRateItem.setVisible(true);
+        } else if (currentState == ENUM_STATE_FAVORITE) {
+            toolbar.setTitle(R.string.sort_ctx_favorite);
+            mFaveItem.setVisible(false); // No need to see self as an option to change to
+            mPopItem.setVisible(true);
             mRateItem.setVisible(true);
         }
     }
 
-    private static void showProgressBar() {
-        mProgressBar.setVisibility(mTransitioningSort ? View.VISIBLE : View.INVISIBLE);
+    private void showWaitingBar() {
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(mTransitioningSort ? View.VISIBLE : View.INVISIBLE);
     }
 
-    private void sortByCurrentChoice() {
+    private void sortByCurrentChoice(int state) {
         if (!mTransitioningSort) {
             mTransitioningSort = true;
-            showProgressBar();
-            if (mSortState == ENUM_SORT_AVERAGE_RATING_DESCENDING) {
-                sortByRatings();
-            } else if (mSortState == ENUM_SORT_POPULARITY_DESCENDING) {
-                sortByPopularity();
-            }
+            showWaitingBar();
+            mViewModel.performNewSearch(state);
         }
     }
 
@@ -255,21 +215,13 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
     private void savePreferences() {
         SharedPreferences preferences = getSharedPreferences(SETTINGS_FILE, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(SETTINGS_SORT_LAST, mSortState);
+        editor.putInt(SETTINGS_SORT_LAST, mViewModel.getState());
         editor.apply();
-    }
-
-    private void restorePreferences() {
-        SharedPreferences preferences = getSharedPreferences(SETTINGS_FILE, MODE_PRIVATE);
-        mSortState = preferences.getInt(SETTINGS_SORT_LAST, ENUM_SORT_POPULARITY_DESCENDING);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        // https://stackoverflow.com/questions/10953121/android-arraylistmyobject-pass-as-parcelable
-        // https://stackoverflow.com/questions/12793069/android-onsaveinstancestate-not-being-called-from-activity
-        outState.putParcelableArrayList(ENTIRE_MOVIE_ARRAY, mMovies);
         savePreferences();
     }
 }
