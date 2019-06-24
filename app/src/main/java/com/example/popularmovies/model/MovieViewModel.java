@@ -3,6 +3,7 @@ package com.example.popularmovies.model;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -31,6 +32,7 @@ public class MovieViewModel extends AndroidViewModel implements
     private DatabaseContainer mPopular;
     private DatabaseContainer mRatings;
     private MoviesChangedListener mListener;
+    private Observer mFavoritesObserver;
 
     MovieViewModel(@NonNull Application application, @Nullable MoviesChangedListener listener) {
         super(application);
@@ -47,6 +49,14 @@ public class MovieViewModel extends AndroidViewModel implements
 
         SharedPreferences preferences = application.getSharedPreferences(SETTINGS_FILE, MODE_PRIVATE);
         mState = preferences.getInt(SETTINGS_SORT_LAST, ENUM_STATE_POPULAR);
+        mFavoritesObserver = new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                if (mListener != null) {
+                    mListener.onMoviesChanged();
+                }
+            }
+        };
 
         performNewSearch(mState);
     }
@@ -55,6 +65,13 @@ public class MovieViewModel extends AndroidViewModel implements
     public void onDatabaseSetChanged() {
         if (mListener != null) {
             mListener.onMoviesChanged();
+            if (mState == ENUM_STATE_FAVORITE) {
+                // noinspection unchecked
+                mFavorites.getLiveMovies().observeForever(mFavoritesObserver);
+            } else {
+                // noinspection unchecked
+                mFavorites.getLiveMovies().removeObserver(mFavoritesObserver);
+            }
         }
     }
 

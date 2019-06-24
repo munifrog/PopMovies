@@ -21,10 +21,9 @@ class DatabaseContainer {
     ) {
         mListener = listener;
         mDatabase = LocalDatabase.getInstance(application, state);
-        mObserver = new Observer() {
+        mObserver = new Observer<List<Movie>>() {
             @Override
-            public void onChanged(@Nullable Object o) {
-                removeObserver();
+            public void onChanged(@Nullable List<Movie> movies) {
                 mMovies = mMoviesLive.getValue();
                 mListener.onDatabaseSetChanged();
             }

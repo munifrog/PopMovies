@@ -132,9 +132,9 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         mViewModel.getLiveMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
+                // This is used for the initial grid layout population
                 mViewModel.getLiveMovies().removeObserver(this);
-                updateAdapterWithNewMovieSet();
-                showWaitingBar();
+                onMoviesChanged();
             }
         });
     }
