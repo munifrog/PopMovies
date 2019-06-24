@@ -32,7 +32,7 @@ public class MovieDiscoverer extends AsyncTask<Uri, Void, LiveData<List<Movie>>>
     }
 
     public interface MovieDiscoveredListener {
-        void onMovieExtractionComplete(LiveData<List<Movie>> reviews, int state);
+        void onMovieExtractionComplete(LiveData<List<Movie>> movies, int state);
         void onInternetFailure();
     }
 

@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.popularmovies.extractors.FavoritesLoader;
 import com.example.popularmovies.utils.HttpManipulator;
 import com.example.popularmovies.extractors.MovieDiscoverer;
 
@@ -21,14 +22,16 @@ import static com.example.popularmovies.MovieConst.SETTINGS_FILE;
 import static com.example.popularmovies.MovieConst.SETTINGS_SORT_LAST;
 
 public class MovieViewModel extends AndroidViewModel implements
-        MovieDiscoverer.MovieDiscoveredListener {
+        MovieDiscoverer.MovieDiscoveredListener,
+        FavoritesLoader.FavoritesLoaderListener
+{
     private int mState;
     private DatabaseContainer mFavorites;
     private DatabaseContainer mPopular;
     private DatabaseContainer mRatings;
     private MoviesChangedListener mListener;
 
-    public MovieViewModel(@NonNull Application application, @Nullable MoviesChangedListener listener) {
+    MovieViewModel(@NonNull Application application, @Nullable MoviesChangedListener listener) {
         super(application);
 
         mListener = listener;
@@ -57,26 +60,30 @@ public class MovieViewModel extends AndroidViewModel implements
             MovieDiscoverer discoverer = new MovieDiscoverer(this, searchState, this);
             Uri uri = HttpManipulator.getSortedUri(searchState, 1);
             discoverer.execute(uri);
+        } else {
+            new FavoritesLoader(this, this).execute();
         }
     }
 
     @Override
     public void onMovieExtractionComplete(LiveData<List<Movie>> movies, int state) {
-        mState = state;
         switch(mState) {
             case ENUM_STATE_FAVORITE:
+                mState = state;
                 mFavorites.setMovies(movies);
                 if (mListener != null) {
                     mListener.onMoviesChanged();
                 }
                 break;
             case ENUM_STATE_POPULAR:
+                mState = state;
                 mPopular.setMovies(movies);
                 if (mListener != null) {
                     mListener.onMoviesChanged();
                 }
                 break;
             case ENUM_STATE_RATING:
+                mState = state;
                 mRatings.setMovies(movies);
                 if (mListener != null) {
                     mListener.onMoviesChanged();
