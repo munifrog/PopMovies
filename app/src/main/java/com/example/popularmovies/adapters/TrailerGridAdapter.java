@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.popularmovies.R;
 import com.example.popularmovies.model.Trailer;
@@ -29,7 +30,7 @@ public class TrailerGridAdapter extends RecyclerView.Adapter<TrailerGridAdapter.
     @Override
     public TrailerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        int layoutId = R.layout.grid_item;
+        int layoutId = R.layout.trailer_item;
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(layoutId,parent, false);
 
@@ -52,15 +53,19 @@ public class TrailerGridAdapter extends RecyclerView.Adapter<TrailerGridAdapter.
 
     class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView mMovieView;
+        TextView mCount;
 
         TrailerViewHolder(View item) {
             super(item);
-            mMovieView = item.findViewById(R.id.iv_movie);
+            mMovieView = item.findViewById(R.id.iv_icon);
+            mCount = item.findViewById(R.id.tv_trailer_count);
             item.setOnClickListener(this);
         }
 
         void bind(int position){
-            mMovieView.setImageResource(android.R.drawable.ic_media_play);
+            mMovieView.setImageResource(R.drawable.movie_trailer);
+            mMovieView.setContentDescription(mTrailers.get(position).getTrailerName());
+            mCount.setText(Integer.toString(position + 1));
         }
 
         @Override
