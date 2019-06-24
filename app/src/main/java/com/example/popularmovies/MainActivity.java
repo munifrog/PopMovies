@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
                 mAdapter.setMovieImages(images);
             }
         }
+        showSortByMenuItem();
         mTransitioningSort = false;
     }
 
