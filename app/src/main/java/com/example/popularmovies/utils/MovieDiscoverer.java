@@ -14,12 +14,12 @@ import java.util.List;
 //  to improve code readability and maintainability. (I would have to communicate transitionSort
 //  and Movie array)
 // URL <= Input params; Void <= progress; List<Movie> <= result
-public class SortedMovieDiscoverer extends AsyncTask<Uri, Void, LiveData<List<Movie>>> {
+public class MovieDiscoverer extends AsyncTask<Uri, Void, LiveData<List<Movie>>> {
     private MovieViewModel mViewModel;
     private int mState;
     private MovieDiscoveredListener mListener;
 
-    public SortedMovieDiscoverer(
+    public MovieDiscoverer(
             MovieViewModel viewModel,
             int state,
             MovieDiscoveredListener listener

@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.popularmovies.utils.HttpManipulator;
-import com.example.popularmovies.utils.SortedMovieDiscoverer;
+import com.example.popularmovies.utils.MovieDiscoverer;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import static com.example.popularmovies.MovieConst.SETTINGS_FILE;
 import static com.example.popularmovies.MovieConst.SETTINGS_SORT_LAST;
 
 public class MovieViewModel extends AndroidViewModel implements
-        SortedMovieDiscoverer.MovieDiscoveredListener {
+        MovieDiscoverer.MovieDiscoveredListener {
     private int mState;
     private DatabaseContainer mFavorites;
     private DatabaseContainer mPopular;
@@ -54,7 +54,7 @@ public class MovieViewModel extends AndroidViewModel implements
 
     public void performNewSearch(int searchState) {
         if (searchState == ENUM_STATE_POPULAR || searchState == ENUM_STATE_RATING) {
-            SortedMovieDiscoverer discoverer = new SortedMovieDiscoverer(this, searchState, this);
+            MovieDiscoverer discoverer = new MovieDiscoverer(this, searchState, this);
             Uri uri = HttpManipulator.getSortedUri(searchState, 1);
             discoverer.execute(uri);
         }
