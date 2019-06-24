@@ -1,4 +1,4 @@
-package com.example.popularmovies.utils;
+package com.example.popularmovies.extractors;
 
 import android.arch.lifecycle.LiveData;
 import android.net.Uri;
@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 import com.example.popularmovies.model.LocalDatabase;
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.model.MovieViewModel;
+import com.example.popularmovies.utils.HttpManipulator;
+import com.example.popularmovies.utils.JsonManipulator;
 
 import java.util.List;
 

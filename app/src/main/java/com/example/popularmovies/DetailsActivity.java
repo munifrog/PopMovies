@@ -26,8 +26,8 @@ import com.example.popularmovies.model.MovieViewModelFactory;
 import com.example.popularmovies.model.Review;
 import com.example.popularmovies.model.Trailer;
 import com.example.popularmovies.utils.HttpManipulator;
-import com.example.popularmovies.utils.ReviewDiscoverer;
-import com.example.popularmovies.utils.TrailerDiscoverer;
+import com.example.popularmovies.extractors.ReviewDiscoverer;
+import com.example.popularmovies.extractors.TrailerDiscoverer;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;

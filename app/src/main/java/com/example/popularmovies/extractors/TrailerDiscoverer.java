@@ -1,9 +1,11 @@
-package com.example.popularmovies.utils;
+package com.example.popularmovies.extractors;
 
 import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.example.popularmovies.model.Trailer;
+import com.example.popularmovies.utils.HttpManipulator;
+import com.example.popularmovies.utils.JsonManipulator;
 
 import java.util.List;
 

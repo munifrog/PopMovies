@@ -41,7 +41,7 @@ public class JsonManipulator {
 
     private static final String NOMINAL_NULL           = "null";
 
-    static List<Movie> extractMoviesFromJson(String json) {
+    public static List<Movie> extractMoviesFromJson(String json) {
         List<Movie> movies = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(json);

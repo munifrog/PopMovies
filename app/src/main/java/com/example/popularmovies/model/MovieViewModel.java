@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.example.popularmovies.utils.HttpManipulator;
-import com.example.popularmovies.utils.MovieDiscoverer;
+import com.example.popularmovies.extractors.MovieDiscoverer;
 
 import java.util.List;
 
