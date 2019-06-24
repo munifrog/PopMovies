@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.example.popularmovies.utils.HttpManipulator;
 import com.example.popularmovies.utils.SortedMovieDiscoverer;
@@ -27,7 +28,7 @@ public class MovieViewModel extends AndroidViewModel implements
     private DatabaseContainer mRatings;
     private MoviesChangedListener mListener;
 
-    public MovieViewModel(@NonNull Application application, MoviesChangedListener listener) {
+    public MovieViewModel(@NonNull Application application, @Nullable MoviesChangedListener listener) {
         super(application);
 
         mListener = listener;
@@ -48,6 +49,7 @@ public class MovieViewModel extends AndroidViewModel implements
 
     public interface MoviesChangedListener {
         void onMoviesChanged();
+        void onInternetFailure();
     }
 
     public void performNewSearch(int searchState) {
@@ -80,6 +82,13 @@ public class MovieViewModel extends AndroidViewModel implements
                     mListener.onMoviesChanged();
                 }
                 break;
+        }
+    }
+
+    @Override
+    public void onInternetFailure() {
+        if(mListener != null) {
+            mListener.onInternetFailure();
         }
     }
 

@@ -16,6 +16,7 @@ public class ReviewDiscoverer extends AsyncTask<Uri, Void, List<Review>> {
 
     public interface ReviewDiscoveredListener {
         void onReviewExtractionComplete(List<Review> reviews);
+        void onInternetFailure();
     }
 
     @Override
@@ -26,7 +27,7 @@ public class ReviewDiscoverer extends AsyncTask<Uri, Void, List<Review>> {
             String json = HttpManipulator.getResponse(HttpManipulator.uri2url(uri));
             reviews = JsonManipulator.extractReviewsFromJson(json);
         } catch (RuntimeException e) {
-            // Internet unavailable
+            mListener.onInternetFailure();
         }
         return reviews;
     }

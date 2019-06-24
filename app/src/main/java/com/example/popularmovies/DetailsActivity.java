@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.popularmovies.adapters.ReviewListAdapter;
 import com.example.popularmovies.adapters.TrailerGridAdapter;
@@ -231,6 +233,22 @@ public class DetailsActivity extends AppCompatActivity implements MovieConst,
     @Override
     public void onReviewExtractionComplete(List<Review> reviews) {
         mReviewsAdapter.setReviews(reviews);
+    }
+
+    @Override
+    public void onInternetFailure() {
+        // See https://stackoverflow.com/questions/11123621/running-code-in-main-thread-from-another-thread
+        Handler mainHandler = new Handler(getMainLooper());
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(
+                        getApplicationContext(),
+                        R.string.error_internet_failure,
+                        Toast.LENGTH_LONG).show();
+            }
+        };
+        mainHandler.post(runnable);
     }
 
     @Override

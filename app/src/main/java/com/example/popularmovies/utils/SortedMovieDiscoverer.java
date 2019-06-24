@@ -31,6 +31,7 @@ public class SortedMovieDiscoverer extends AsyncTask<Uri, Void, LiveData<List<Mo
 
     public interface MovieDiscoveredListener {
         void onMovieExtractionComplete(LiveData<List<Movie>> reviews, int state);
+        void onInternetFailure();
     }
 
     @Override
@@ -49,8 +50,7 @@ public class SortedMovieDiscoverer extends AsyncTask<Uri, Void, LiveData<List<Mo
             db.dao().loadAllImmediately(); // forces the movie retrieval to finish
             newMovies = db.dao().loadAll();
         } catch (RuntimeException e) {
-            // Do nothing; use previously stored results
-            // Internet unavailable
+            mListener.onInternetFailure();
         }
         return newMovies;
     }

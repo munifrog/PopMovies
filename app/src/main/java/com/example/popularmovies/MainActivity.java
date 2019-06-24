@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.Handler;
+import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -114,11 +116,7 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
                     }
                 }
                 mAdapter.setMovieImages(images);
-            } else {
-                Toast.makeText(this, R.string.error_internet_failure, Toast.LENGTH_LONG).show();
             }
-        } else {
-            Toast.makeText(this, R.string.error_internet_failure, Toast.LENGTH_LONG).show();
         }
         mTransitioningSort = false;
     }
@@ -144,6 +142,22 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
     public void onMoviesChanged() {
         updateAdapterWithNewMovieSet();
         showWaitingBar();
+    }
+
+    @Override
+    public void onInternetFailure() {
+        // See https://stackoverflow.com/questions/11123621/running-code-in-main-thread-from-another-thread
+        Handler mainHandler = new Handler(getMainLooper());
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(
+                        getApplicationContext(),
+                        R.string.error_internet_failure,
+                        Toast.LENGTH_LONG).show();
+            }
+        };
+        mainHandler.post(runnable);
     }
 
     // https://stackoverflow.com/questions/20584325/reliably-get-height-of-status-bar-to-solve-kitkat-translucent-navigation-issue

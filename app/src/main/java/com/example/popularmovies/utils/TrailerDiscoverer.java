@@ -16,6 +16,7 @@ public class TrailerDiscoverer extends AsyncTask<Uri, Void, List<Trailer>> {
 
     public interface TrailerDiscoveredListener {
         void onTrailerExtractionComplete(List<Trailer> trailers);
+        void onInternetFailure();
     }
 
     @Override
@@ -26,7 +27,7 @@ public class TrailerDiscoverer extends AsyncTask<Uri, Void, List<Trailer>> {
             String json = HttpManipulator.getResponse(HttpManipulator.uri2url(uri));
             trailers = JsonManipulator.extractTrailersFromJson(json);
         } catch (RuntimeException e) {
-            // Internet unavailable
+            mListener.onInternetFailure();
         }
         return trailers;
     }
