@@ -26,8 +26,7 @@ public class FavoritesLoader extends AsyncTask<Void, Void, LiveData<List<Movie>>
 
     @Override
     protected LiveData<List<Movie>> doInBackground(Void... voids) {
-        LocalDatabase db = mViewModel.getDatabase();
-        db.dao().loadAllImmediately(); // forces completion before continuing
+        LocalDatabase db = mViewModel.getDatabase(ENUM_STATE_FAVORITE);
         return db.dao().loadAll();
     }
 

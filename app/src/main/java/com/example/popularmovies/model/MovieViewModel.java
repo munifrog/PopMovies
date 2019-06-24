@@ -23,7 +23,8 @@ import static com.example.popularmovies.MovieConst.SETTINGS_SORT_LAST;
 
 public class MovieViewModel extends AndroidViewModel implements
         MovieDiscoverer.MovieDiscoveredListener,
-        FavoritesLoader.FavoritesLoaderListener
+        FavoritesLoader.FavoritesLoaderListener,
+        DatabaseContainer.DatabaseSetChangeListener
 {
     private int mState;
     private DatabaseContainer mFavorites;
@@ -36,9 +37,9 @@ public class MovieViewModel extends AndroidViewModel implements
 
         mListener = listener;
 
-        mFavorites = new DatabaseContainer(application, ENUM_STATE_FAVORITE);
-        mPopular = new DatabaseContainer(application, ENUM_STATE_POPULAR);
-        mRatings = new DatabaseContainer(application, ENUM_STATE_RATING);
+        mFavorites = new DatabaseContainer(application, ENUM_STATE_FAVORITE, this);
+        mPopular = new DatabaseContainer(application, ENUM_STATE_POPULAR, this);
+        mRatings = new DatabaseContainer(application, ENUM_STATE_RATING, this);
 
         loadMoviesByState(ENUM_STATE_FAVORITE);
         loadMoviesByState(ENUM_STATE_POPULAR);
@@ -48,6 +49,13 @@ public class MovieViewModel extends AndroidViewModel implements
         mState = preferences.getInt(SETTINGS_SORT_LAST, ENUM_STATE_POPULAR);
 
         performNewSearch(mState);
+    }
+
+    @Override
+    public void onDatabaseSetChanged() {
+        if (mListener != null) {
+            mListener.onMoviesChanged();
+        }
     }
 
     public interface MoviesChangedListener {
@@ -67,27 +75,18 @@ public class MovieViewModel extends AndroidViewModel implements
 
     @Override
     public void onMovieExtractionComplete(LiveData<List<Movie>> movies, int state) {
-        switch(mState) {
+        switch(state) {
             case ENUM_STATE_FAVORITE:
                 mState = state;
                 mFavorites.setMovies(movies);
-                if (mListener != null) {
-                    mListener.onMoviesChanged();
-                }
                 break;
             case ENUM_STATE_POPULAR:
                 mState = state;
                 mPopular.setMovies(movies);
-                if (mListener != null) {
-                    mListener.onMoviesChanged();
-                }
                 break;
             case ENUM_STATE_RATING:
                 mState = state;
                 mRatings.setMovies(movies);
-                if (mListener != null) {
-                    mListener.onMoviesChanged();
-                }
                 break;
         }
     }
@@ -140,10 +139,6 @@ public class MovieViewModel extends AndroidViewModel implements
             case ENUM_STATE_RATING:
                 return mRatings.getMovies();
         }
-    }
-
-    public LocalDatabase getDatabase() {
-        return getDatabase(mState);
     }
 
     public LocalDatabase getDatabase(int state) {

@@ -12,22 +12,34 @@ class DatabaseContainer {
     private List<Movie> mMovies;
     private LocalDatabase mDatabase;
     private Observer mObserver;
+    private DatabaseSetChangeListener mListener;
 
-    DatabaseContainer(Application application, int state) {
+    DatabaseContainer(
+            Application application,
+            int state,
+            DatabaseSetChangeListener listener
+    ) {
+        mListener = listener;
         mDatabase = LocalDatabase.getInstance(application, state);
         mObserver = new Observer() {
             @Override
             public void onChanged(@Nullable Object o) {
                 removeObserver();
                 mMovies = mMoviesLive.getValue();
+                mListener.onDatabaseSetChanged();
             }
         };
         load();
     }
 
+    public interface DatabaseSetChangeListener {
+        void onDatabaseSetChanged();
+    }
+
     void load() {
         removeObserver();
         mMoviesLive = mDatabase.dao().loadAll();
+        // noinspection unchecked
         mMoviesLive.observeForever(mObserver);
     }
 
@@ -35,12 +47,14 @@ class DatabaseContainer {
         if(newMovies != null) {
             removeObserver();
             mMoviesLive = newMovies;
+            // noinspection unchecked
             mMoviesLive.observeForever(mObserver);
         }
     }
 
     private void removeObserver() {
         if(mMoviesLive != null) {
+            // noinspection unchecked
             mMoviesLive.removeObserver(mObserver);
         }
     }

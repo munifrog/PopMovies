@@ -43,7 +43,7 @@ public class MovieDiscoverer extends AsyncTask<Uri, Void, LiveData<List<Movie>>>
             Uri uri = uris[0];
             String json = HttpManipulator.getResponse(HttpManipulator.uri2url(uri));
             List<Movie> parsedMovies = JsonManipulator.extractMoviesFromJson(json);
-            LocalDatabase db = mViewModel.getDatabase();
+            LocalDatabase db = mViewModel.getDatabase(mState);
             List<Movie> oldMovies = db.dao().loadAllImmediately();
             if(oldMovies != null) {
                 db.dao().deleteMovies(oldMovies);
