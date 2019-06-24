@@ -26,6 +26,8 @@ public class HttpManipulator {
     private final static String TMDB_PATH_IMAGE_P = "p";
     private final static String TMDB_PATH_IMAGE_ORIG = "original";
     private final static String TMDB_PATH_IMAGE_WIDE = "w";
+    private final static String TMDB_PATH_REVIEWS = "reviews";
+    private final static String TMDB_PATH_TRAILERS = "videos";
 
     private final static String TMDB_API_Q_KEY = "api_key";
     private final static String TMDB_API_V_KEY = MovieConst.TMDB_API_KEY;
@@ -47,6 +49,9 @@ public class HttpManipulator {
 
     private final static String TMDB_API_Q_PAGE = "page"; // Values are numbers like 1, 2, etc...
 
+    private final static String VIDEO_SCHEME = "https";
+    private final static String VIDEO_AUTHORITY = "youtu.be";
+
     public static URL uri2url(Uri uri) {
         URL url = null;
 
@@ -56,6 +61,10 @@ public class HttpManipulator {
             e.printStackTrace();
         }
         return url;
+    }
+
+    public static Uri url2uri(URL url) {
+        return Uri.parse(url.toString());
     }
 
     private static Uri.Builder baseMovieUriBuilder() {
@@ -160,5 +169,40 @@ public class HttpManipulator {
             e.printStackTrace();
         }
         return image;
+    }
+
+    public static Uri getTrailerUri(long tmdbMovieId) {
+        return new Uri.Builder()
+                .scheme(TMDB_SCHEME)
+                .authority(TMDB_API_AUTHORITY)
+                .path(TMDB_PATH_API_LEVEL)
+                .appendPath(TMDB_PATH_MOVIE)
+                .appendPath(Long.toString(tmdbMovieId))
+                .appendPath(TMDB_PATH_TRAILERS)
+                .appendQueryParameter(TMDB_API_Q_KEY, TMDB_API_V_KEY)
+                .build()
+                ;
+    }
+
+    public static Uri getSingleTrailerUri(String videoCode) {
+        return new Uri.Builder()
+                .scheme(VIDEO_SCHEME)
+                .authority(VIDEO_AUTHORITY)
+                .path(videoCode)
+                .build()
+                ;
+    }
+
+    public static Uri getReviewsUri(long tmdbMovieId) {
+        return new Uri.Builder()
+                .scheme(TMDB_SCHEME)
+                .authority(TMDB_API_AUTHORITY)
+                .path(TMDB_PATH_API_LEVEL)
+                .appendPath(TMDB_PATH_MOVIE)
+                .appendPath(Long.toString(tmdbMovieId))
+                .appendPath(TMDB_PATH_REVIEWS)
+                .appendQueryParameter(TMDB_API_Q_KEY, TMDB_API_V_KEY)
+                .build()
+                ;
     }
 }

@@ -24,7 +24,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
+        android:padding="@dimen/padding_horizontal"
         android:background="@color/colorForeground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -40,8 +40,8 @@
                 android:id="@+id/tv_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginEnd="@dimen/padding_horizontal"
+                android:layout_marginRight="@dimen/padding_horizontal"
                 android:gravity="end|center_vertical"
                 android:text="@string/sample_text_title"
                 android:textColor="@color/colorText"
@@ -77,25 +77,22 @@
                 android:id="@+id/tv_release"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/padding_vertical"
                 android:text="@string/sample_text_date"
                 android:textColor="@color/colorText"
                 android:textSize="@dimen/text_date_height"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_name_alt" />
 
-
             <TextView
                 android:id="@+id/tv_plot"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/padding_vertical"
                 android:text="@string/sample_text_overview"
                 android:textColor="@color/colorText"
                 android:textSize="@dimen/text_plot_height"
                 android:gravity="end"
-                android:textAlignment="viewEnd"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_release"/>
@@ -104,15 +101,66 @@
                 android:id="@+id/iv_favorite"
                 android:layout_width="@dimen/icon_favorite_height"
                 android:layout_height="@dimen/icon_favorite_height"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginTop="@dimen/padding_vertical"
+                android:layout_marginEnd="@dimen/padding_horizontal"
+                android:layout_marginRight="@dimen/padding_horizontal"
                 android:onClick="toggleFavorite"
                 android:alpha="0.7"
                 android:contentDescription="@string/favorite_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_plot"
                 app:srcCompat="@android:drawable/star_big_off" />
+
+            <TextView
+                android:id="@+id/tv_trailers_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/text_trailers"
+                android:textColor="@color/colorText"
+                android:textSize="@dimen/text_plot_height"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_favorite" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_trailers_grid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/padding_vertical"
+                android:foregroundGravity="fill"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_trailers_label" />
+
+            <TextView
+                android:id="@+id/tv_reviews_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/text_reviews"
+                android:textColor="@color/colorText"
+                android:textSize="@dimen/text_plot_height"
+                app:layout_constraintEnd_toEndOf="@+id/tv_trailers_label"
+                app:layout_constraintTop_toBottomOf="@+id/rv_trailers_grid" />
+
+            <View
+                android:id="@+id/v_sep_reviews"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/padding_vertical"
+                android:background="@color/colorText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_reviews_label"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_reviews_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:foregroundGravity="fill"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/v_sep_reviews" />
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>

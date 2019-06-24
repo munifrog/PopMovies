@@ -16,11 +16,13 @@
 
     <string name="unknown_release_date">Release date: Unknown</string>
 
-    <string name="sample_text_title">Movie Title</string>
-    <string name="sample_text_title_alt">[Alternate Movie Title]</string>
-    <string name="sample_text_date">March 2019</string>
-    <string name="sample_text_average">86%</string>
-    <string name="sample_text_overview">Description</string>
+    <string name="sample_text_title" translatable="false">Movie Title</string>
+    <string name="sample_text_title_alt" translatable="false">[Alternate Movie Title]</string>
+    <string name="sample_text_date" translatable="false">March 2019</string>
+    <string name="sample_text_average" translatable="false">86%</string>
+    <string name="sample_text_overview" translatable="false">Description</string>
+    <string name="text_trailers">Trailers</string>
+    <string name="text_reviews">Reviews</string>
 
     <string name="action_about">About</string>
     <string name="action_favorites">Favorites</string>

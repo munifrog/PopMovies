@@ -7,24 +7,43 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.popularmovies.adapters.ReviewListAdapter;
+import com.example.popularmovies.adapters.TrailerGridAdapter;
 import com.example.popularmovies.model.CalendarConverter;
 import com.example.popularmovies.model.LocalDatabase;
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.model.MovieViewModel;
+import com.example.popularmovies.model.MovieViewModelFactory;
+import com.example.popularmovies.model.Review;
+import com.example.popularmovies.model.Trailer;
 import com.example.popularmovies.utils.HttpManipulator;
+import com.example.popularmovies.utils.ReviewDiscoverer;
+import com.example.popularmovies.utils.TrailerDiscoverer;
 import com.squareup.picasso.Picasso;
 
+import java.net.URL;
 import java.util.Calendar;
+import java.util.List;
 
-public class DetailsActivity extends AppCompatActivity implements MovieConst {
+public class DetailsActivity extends AppCompatActivity implements MovieConst,
+        ReviewDiscoverer.ReviewDiscoveredListener,
+        ReviewListAdapter.ReviewListClickListener,
+        TrailerDiscoverer.TrailerDiscoveredListener,
+        TrailerGridAdapter.TrailerGridClickListener
+{
     private static Movie mMovie;
     private static Movie mFaveMovie;
     private static LocalDatabase mDatabase;
     private boolean mIsFave = false;
+    private ReviewListAdapter mReviewsAdapter;
+    private TrailerGridAdapter mTrailersAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +87,10 @@ public class DetailsActivity extends AppCompatActivity implements MovieConst {
             } else {
                 iv_poster.setImageResource(R.drawable.poster_not_found);
             }
+            // These also take extra time on a background thread to populate
+            setupAdapters();
+            extractTrailers();
+            extractReviews();
 
             tv_name.setText(titleCurrent);
 
@@ -130,7 +153,8 @@ public class DetailsActivity extends AppCompatActivity implements MovieConst {
     }
 
     private void determineFavoriteStatus() {
-        MovieViewModel viewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+        MovieViewModelFactory factory = new MovieViewModelFactory(getApplication(), null);
+        MovieViewModel viewModel = ViewModelProviders.of(this, factory).get(MovieViewModel.class);
         mDatabase = viewModel.getDatabase(ENUM_STATE_FAVORITE);
         mDatabase.dao().loadById(mMovie.getId()).observe(this, new Observer<Movie>() {
             @Override
@@ -158,20 +182,73 @@ public class DetailsActivity extends AppCompatActivity implements MovieConst {
 
                 new Thread(new Runnable() {
                     @Override
-                    public void run() {
-                        mDatabase.dao().insertMovie(mMovie);
-                    }
+                    public void run() { mDatabase.dao().insertMovie(mMovie); }
                 }).start();
             }
         } else {
             if (mFaveMovie != null) {
                 new Thread(new Runnable() {
                     @Override
-                    public void run() {
-                        mDatabase.dao().deleteMovie(mFaveMovie);
-                    }
+                    public void run() { mDatabase.dao().deleteMovie(mFaveMovie); }
                 }).start();
             }
+        }
+    }
+
+    public void extractTrailers() {
+        Uri uri = HttpManipulator.getTrailerUri(mMovie.getId());
+        new TrailerDiscoverer(this).execute(uri);
+    }
+
+    public void extractReviews() {
+        Uri uri = HttpManipulator.getReviewsUri(mMovie.getId());
+        new ReviewDiscoverer(this).execute(uri);
+    }
+
+    private void launchUri(Uri uri) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(uri);
+        if(intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
+    private void setupAdapters() {
+        RecyclerView reviewsRecyclerView = findViewById(R.id.rv_reviews_list);
+        LinearLayoutManager reviewLayoutManager = new LinearLayoutManager(this);
+        reviewsRecyclerView.setLayoutManager(reviewLayoutManager);
+        mReviewsAdapter = new ReviewListAdapter(this);
+        reviewsRecyclerView.setAdapter(mReviewsAdapter);
+
+        RecyclerView trailerRecyclerView = findViewById(R.id.rv_trailers_grid);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
+        trailerRecyclerView.setLayoutManager(gridLayoutManager);
+        mTrailersAdapter = new TrailerGridAdapter(this);
+        trailerRecyclerView.setAdapter(mTrailersAdapter);
+        trailerRecyclerView.stopScroll();
+    }
+
+    @Override
+    public void onReviewExtractionComplete(List<Review> reviews) {
+        mReviewsAdapter.setReviews(reviews);
+    }
+
+    @Override
+    public void onReviewClick(URL toLaunch) {
+        if (toLaunch != null) {
+            launchUri(HttpManipulator.url2uri(toLaunch));
+        }
+    }
+
+    @Override
+    public void onTrailerExtractionComplete(List<Trailer> trailers) {
+        mTrailersAdapter.setTrailers(trailers);
+    }
+
+    @Override
+    public void onTrailerClick(String videoKey) {
+        if(videoKey != null && !videoKey.isEmpty()) {
+            launchUri(HttpManipulator.getSingleTrailerUri(videoKey));
         }
     }
 }

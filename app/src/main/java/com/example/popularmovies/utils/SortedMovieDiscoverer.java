@@ -17,10 +17,20 @@ import java.util.List;
 public class SortedMovieDiscoverer extends AsyncTask<Uri, Void, LiveData<List<Movie>>> {
     private MovieViewModel mViewModel;
     private int mState;
+    private MovieDiscoveredListener mListener;
 
-    public SortedMovieDiscoverer(MovieViewModel viewModel, int state) {
+    public SortedMovieDiscoverer(
+            MovieViewModel viewModel,
+            int state,
+            MovieDiscoveredListener listener
+    ) {
         mViewModel = viewModel;
         mState = state;
+        mListener = listener;
+    }
+
+    public interface MovieDiscoveredListener {
+        void onMovieExtractionComplete(LiveData<List<Movie>> reviews, int state);
     }
 
     @Override
@@ -36,7 +46,7 @@ public class SortedMovieDiscoverer extends AsyncTask<Uri, Void, LiveData<List<Mo
                 db.dao().deleteMovies(oldMovies);
             }
             db.dao().insertMovies(parsedMovies);
-            db.dao().loadAllImmediately(); // forces it to finish loading first
+            db.dao().loadAllImmediately(); // forces the movie retrieval to finish
             newMovies = db.dao().loadAll();
         } catch (RuntimeException e) {
             // Do nothing; use previously stored results
@@ -48,6 +58,6 @@ public class SortedMovieDiscoverer extends AsyncTask<Uri, Void, LiveData<List<Mo
     @Override
     protected void onPostExecute(LiveData<List<Movie>> newMovies) {
         super.onPostExecute(newMovies);
-        mViewModel.updateMovies(newMovies, mState);
+        mListener.onMovieExtractionComplete(newMovies, mState);
     }
 }

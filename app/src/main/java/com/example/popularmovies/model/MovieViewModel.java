@@ -6,7 +6,6 @@ import android.arch.lifecycle.LiveData;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.example.popularmovies.utils.HttpManipulator;
 import com.example.popularmovies.utils.SortedMovieDiscoverer;
@@ -20,17 +19,18 @@ import static com.example.popularmovies.MovieConst.ENUM_STATE_RATING;
 import static com.example.popularmovies.MovieConst.SETTINGS_FILE;
 import static com.example.popularmovies.MovieConst.SETTINGS_SORT_LAST;
 
-public class MovieViewModel extends AndroidViewModel {
-    private static String TAG = MovieViewModel.class.getSimpleName();
-
+public class MovieViewModel extends AndroidViewModel implements
+        SortedMovieDiscoverer.MovieDiscoveredListener {
     private int mState;
     private DatabaseContainer mFavorites;
     private DatabaseContainer mPopular;
     private DatabaseContainer mRatings;
+    private MoviesChangedListener mListener;
 
-    public MovieViewModel(@NonNull Application application) {
+    public MovieViewModel(@NonNull Application application, MoviesChangedListener listener) {
         super(application);
-        Log.v(TAG, "MovieViewModel::constructor");
+
+        mListener = listener;
 
         mFavorites = new DatabaseContainer(application, ENUM_STATE_FAVORITE);
         mPopular = new DatabaseContainer(application, ENUM_STATE_POPULAR);
@@ -46,32 +46,44 @@ public class MovieViewModel extends AndroidViewModel {
         performNewSearch(mState);
     }
 
+    public interface MoviesChangedListener {
+        void onMoviesChanged();
+    }
+
     public void performNewSearch(int searchState) {
-        Log.v(TAG, "performNewSearch [" + searchState + "]");
         if (searchState == ENUM_STATE_POPULAR || searchState == ENUM_STATE_RATING) {
-            SortedMovieDiscoverer discoverer = new SortedMovieDiscoverer(this, searchState);
+            SortedMovieDiscoverer discoverer = new SortedMovieDiscoverer(this, searchState, this);
             Uri uri = HttpManipulator.getSortedUri(searchState, 1);
             discoverer.execute(uri);
         }
     }
-    // Mostly a callback for the background thread
-    public void updateMovies(LiveData<List<Movie>> movies, int state) {
+
+    @Override
+    public void onMovieExtractionComplete(LiveData<List<Movie>> movies, int state) {
         mState = state;
         switch(mState) {
             case ENUM_STATE_FAVORITE:
                 mFavorites.setMovies(movies);
+                if (mListener != null) {
+                    mListener.onMoviesChanged();
+                }
                 break;
             case ENUM_STATE_POPULAR:
                 mPopular.setMovies(movies);
+                if (mListener != null) {
+                    mListener.onMoviesChanged();
+                }
                 break;
             case ENUM_STATE_RATING:
                 mRatings.setMovies(movies);
+                if (mListener != null) {
+                    mListener.onMoviesChanged();
+                }
                 break;
         }
     }
 
     private void loadMoviesByState(int state) {
-        Log.v(TAG, "loadMoviesByState [" + state + "]");
         switch(state) {
             case ENUM_STATE_FAVORITE:
                 mFavorites.load();
@@ -86,12 +98,10 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Movie>> getLiveMovies() {
-        Log.v(TAG, "getLiveMovies");
         return getLiveMovies(mState);
     }
 
     public LiveData<List<Movie>> getLiveMovies(int state) {
-        Log.v(TAG, "getLiveMovies");
         // It is assumed that the LiveData will change in the future
         switch(state) {
             case ENUM_STATE_FAVORITE:
@@ -105,7 +115,6 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public List<Movie> getMovies() {
-        Log.v(TAG, "getMovies");
         switch(mState) {
             case ENUM_STATE_FAVORITE:
                 return mFavorites.getMovies();
@@ -122,7 +131,6 @@ public class MovieViewModel extends AndroidViewModel {
     }
 
     public LocalDatabase getDatabase(int state) {
-        Log.v(TAG, "getDatabase");
         switch(state) {
             case ENUM_STATE_FAVORITE:
                 return mFavorites.getDatabase();
@@ -134,7 +142,5 @@ public class MovieViewModel extends AndroidViewModel {
         }
     }
 
-    public int getState() {
-        return mState;
-    }
+    public int getState() { return mState; }
 }

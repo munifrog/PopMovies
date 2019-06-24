@@ -20,11 +20,14 @@ import android.widget.Toast;
 import com.example.popularmovies.model.CalendarConverter;
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.model.MovieViewModel;
+import com.example.popularmovies.model.MovieViewModelFactory;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieConst,
-        GridAdapter.GridClickListener {
+        GridAdapter.GridClickListener,
+        MovieViewModel.MoviesChangedListener
+{
     private static boolean mTransitioningSort;
     private static MenuItem mFaveItem;
     private static MenuItem mPopItem;
@@ -121,7 +124,8 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
     }
 
     private void setupViewModel() {
-        mViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+        MovieViewModelFactory factory = new MovieViewModelFactory(getApplication(), this);
+        mViewModel = ViewModelProviders.of(this, factory).get(MovieViewModel.class);
         retrieveMovies();
     }
 
@@ -129,12 +133,17 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         mViewModel.getLiveMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
-                if(movies != null) {
-                    updateAdapterWithNewMovieSet();
-                    showWaitingBar();
-                }
+                mViewModel.getLiveMovies().removeObserver(this);
+                updateAdapterWithNewMovieSet();
+                showWaitingBar();
             }
         });
+    }
+
+    @Override
+    public void onMoviesChanged() {
+        updateAdapterWithNewMovieSet();
+        showWaitingBar();
     }
 
     // https://stackoverflow.com/questions/20584325/reliably-get-height-of-status-bar-to-solve-kitkat-translucent-navigation-issue

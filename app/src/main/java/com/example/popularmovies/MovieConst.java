@@ -34,7 +34,6 @@ public interface MovieConst {
     String MOVIE_OVERVIEW         = "movie_overview";
     String MOVIE_RATING           = "movie_rating";
     String MOVIE_RELEASE          = "movie_release";
-    String MOVIE_STATE            = "movie_state";
 
     String SETTINGS_FILE          = "pop_movie_settings";
     String SETTINGS_SORT_LAST     = "last_sort";

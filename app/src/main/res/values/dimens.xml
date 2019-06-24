@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="dimen_progress_bar">150dp</dimen>
+    <dimen name="icon_favorite_height">56dp</dimen>
+    <dimen name="padding_horizontal">16dp</dimen>
+    <dimen name="padding_vertical">16dp</dimen>
+
     <dimen name="text_title_height">44sp</dimen>
     <dimen name="text_date_height">32sp</dimen>
     <dimen name="text_average_height">22sp</dimen>
     <dimen name="text_plot_height">28sp</dimen>
-    <dimen name="icon_favorite_height">56dp</dimen>
 </resources>
