@@ -65,7 +65,7 @@ public class TrailerGridAdapter extends RecyclerView.Adapter<TrailerGridAdapter.
         void bind(int position){
             mMovieView.setImageResource(R.drawable.movie_trailer);
             mMovieView.setContentDescription(mTrailers.get(position).getTrailerName());
-            mCount.setText(Integer.toString(position + 1));
+            mCount.setText(mTrailers.get(position).getTrailerName());
         }
 
         @Override
