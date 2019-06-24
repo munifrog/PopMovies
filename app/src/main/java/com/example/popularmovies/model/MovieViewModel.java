@@ -5,7 +5,6 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -83,8 +82,7 @@ public class MovieViewModel extends AndroidViewModel implements
     public void performNewSearch(int searchState) {
         if (searchState == ENUM_STATE_POPULAR || searchState == ENUM_STATE_RATING) {
             MovieDiscoverer discoverer = new MovieDiscoverer(this, searchState, this);
-            Uri uri = HttpManipulator.getSortedUri(searchState, 1);
-            discoverer.execute(uri);
+            discoverer.execute(HttpManipulator.getSortedUri(searchState));
         } else {
             new FavoritesLoader(this, this).execute();
         }
