@@ -1,4 +1,4 @@
-package com.example.popularmovies;
+package com.example.popularmovies.adapters;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,16 +9,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.popularmovies.R;
 import com.example.popularmovies.utils.HttpManipulator;
 import com.squareup.picasso.Picasso;
 
-public class GridAdapter extends RecyclerView.Adapter<GridAdapter.MovieViewHolder> {
+public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.MovieViewHolder> {
     private final GridClickListener mListener;
 
     private int mImageSize;
     private String[] mImages;
 
-    GridAdapter(GridClickListener listener, int imageSize) {
+    public MovieGridAdapter(GridClickListener listener, int imageSize) {
         // The adapter only needs the images to do its job
         mListener = listener;
         mImageSize = imageSize;
@@ -82,7 +83,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.MovieViewHolde
         }
     }
 
-    void setMovieImages(String [] images) {
+    public void setMovieImages(String [] images) {
         mImages = images;
         notifyDataSetChanged();
     }

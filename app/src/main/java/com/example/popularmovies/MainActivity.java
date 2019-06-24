@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Handler;
-import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +18,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.popularmovies.adapters.MovieGridAdapter;
 import com.example.popularmovies.model.CalendarConverter;
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.model.MovieViewModel;
@@ -27,14 +27,14 @@ import com.example.popularmovies.model.MovieViewModelFactory;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieConst,
-        GridAdapter.GridClickListener,
+        MovieGridAdapter.GridClickListener,
         MovieViewModel.MoviesChangedListener
 {
     private static boolean mTransitioningSort;
     private static MenuItem mFaveItem;
     private static MenuItem mPopItem;
     private static MenuItem mRateItem;
-    private static GridAdapter mAdapter;
+    private static MovieGridAdapter mAdapter;
     private static MovieViewModel mViewModel;
 
     private static final String INDICATE_STATUS_BAR = "status_bar_height";
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements MovieConst,
         RecyclerView gridRecyclerView = findViewById(R.id.rv_grid);
         GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
         gridRecyclerView.setLayoutManager(layoutManager);
-        mAdapter = new GridAdapter(this, ENUM_IMAGE_0342);
+        mAdapter = new MovieGridAdapter(this, ENUM_IMAGE_0342);
         gridRecyclerView.setAdapter(mAdapter);
         gridRecyclerView.setPadding(0, getStatusBarHeight(),0,0);
     }
