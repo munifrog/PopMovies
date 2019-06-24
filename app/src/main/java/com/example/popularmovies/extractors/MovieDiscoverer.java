@@ -38,23 +38,21 @@ public class MovieDiscoverer extends AsyncTask<Uri, Void, LiveData<List<Movie>>>
 
     @Override
     protected LiveData<List<Movie>> doInBackground(Uri... uris) {
-        LiveData<List<Movie>> newMovies = null;
+        LocalDatabase db = mViewModel.getDatabase(mState);
         try {
             Uri uri = uris[0];
             String json = HttpManipulator.getResponse(HttpManipulator.uri2url(uri));
             List<Movie> parsedMovies = JsonManipulator.extractMoviesFromJson(json);
-            LocalDatabase db = mViewModel.getDatabase(mState);
             List<Movie> oldMovies = db.dao().loadAllImmediately();
             if(oldMovies != null) {
                 db.dao().deleteMovies(oldMovies);
             }
             db.dao().insertMovies(parsedMovies);
             db.dao().loadAllImmediately(); // forces the movie retrieval to finish
-            newMovies = db.dao().loadAll();
         } catch (RuntimeException e) {
             mListener.onInternetFailure();
         }
-        return newMovies;
+        return db.dao().loadAll();
     }
 
     @Override
