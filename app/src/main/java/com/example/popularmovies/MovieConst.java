@@ -1,7 +1,5 @@
 package com.example.popularmovies;
 
-import java.util.Calendar;
-
 public interface MovieConst {
     // This site suggested using an interface instead of a class:
     // https://stackoverflow.com/questions/3866190/java-constants-file
@@ -23,9 +21,6 @@ public interface MovieConst {
     int PREF_SPAN_PORTRAIT = 2;
 
     String TMDB_API_KEY           = "PLACEHOLDER";
-
-    String ENTIRE_PARCELLED_MOVIE = "movie_entire";
-    String ENTIRE_MOVIE_ARRAY     = "movie_array";
 
     String MOVIE_ID               = "movie_id";
     String MOVIE_TITLE_LOCAL      = "movie_title_local";
