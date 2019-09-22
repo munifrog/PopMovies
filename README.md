@@ -26,7 +26,7 @@ The files for this project were built using Android Studio, so you will likely h
 time duplicating the original behavior using the same.
 
  1. Clone this repository
-    * git clone https://github.com/munifrog/PopMovies.git
+    * `git clone https://github.com/munifrog/PopMovies.git`
  1. Open this directory using Android Studio
  1. Obtain an API key for TMDb usage
     * Mine was free as a student for this app which I will likely not get revenue from
