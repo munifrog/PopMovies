@@ -11,7 +11,7 @@ criteria
  1. Highest rated
  1. Favorites
 
-# Overview
+## Overview
 
 This app uses the internet to retrieve a JSON file containing information regarding the top twenty
 movies matching the specified search criteria (initially most popular or highest rating; which could
@@ -36,7 +36,7 @@ time duplicating the original behavior using the same.
     * Note this example 32-character hexadecimal string did not work at the time of writing
  1. Launch the app on an emulator or device that has internet access
 
-# License
+## License
 This project started as a task within the [Udacity Android Developer Nanodegree Course](https://www.udacity.com/course/android-developer-nanodegree-by-google--nd801)
 and Udacity (or Google) owns the rights for the project idea.
 
